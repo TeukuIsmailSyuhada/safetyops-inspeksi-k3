@@ -13,13 +13,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'SafetyOps Inspect',
     description: 'Scan QR, foto dokumentasi, dan checklist inspeksi alat K3.',
-    images: ['/og.png'],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: 'SafetyOps Inspect',
     description: 'Scan QR, foto dokumentasi, dan checklist inspeksi alat K3.',
-    images: ['/og.png'],
   },
 };
 
