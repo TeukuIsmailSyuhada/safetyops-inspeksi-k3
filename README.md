@@ -7,6 +7,8 @@ MVP aplikasi inspeksi alat K3 berbasis QR untuk mini hackathon. Aplikasi membant
 - Dashboard kondisi operasional dan tindak lanjut prioritas.
 - Daftar alat dengan pencarian dan filter.
 - Detail aset, identitas QR, kondisi, dan tindak lanjut.
+- Login berbasis peran: **Inspector** membuat inspeksi; **Supervisor** menambah dan mengarsipkan aset serta menutup tindak lanjut.
+- CRUD aman: aset baru dibuat oleh Supervisor dan otomatis memiliki QR unik; inspeksi bersifat append-only; aset tidak dihapus, melainkan diarsipkan.
 - Scan QR mode demo.
 - Dokumentasi wajib melalui kamera perangkat; tidak mendukung unggah dari galeri.
 - Checklist APAR, catatan temuan, review, dan status berbasis aturan.
@@ -16,7 +18,7 @@ MVP aplikasi inspeksi alat K3 berbasis QR untuk mini hackathon. Aplikasi membant
 
 Versi terintegrasi memakai Supabase untuk login, database, foto privat, dan data lintas perangkat.
 
-1. Jalankan file SQL berurutan di folder [supabase](supabase/): `001_initial_schema.sql`, lalu `003_inspection_automation.sql`.
+1. Jalankan file SQL berurutan di folder [supabase](supabase/): `001_initial_schema.sql`, `003_inspection_automation.sql`, lalu `004_asset_lifecycle.sql`.
 2. Pastikan provider **Email** aktif di Supabase Authentication.
 3. Tambahkan URL aplikasi lokal dan domain Vercel ke **Authentication → URL Configuration** sebelum mendaftarkan akun pertama.
 
@@ -26,8 +28,8 @@ Publishable key Supabase dipakai di aplikasi browser dan aman hanya karena selur
 
 - HTML5, CSS3, dan Vanilla JavaScript.
 - Browser `MediaDevices/getUserMedia` untuk kamera.
-- Browser `localStorage` untuk riwayat MVP pada perangkat yang sama.
-- Tanpa backend dan tanpa framework runtime pada aplikasi final.
+- Supabase Auth, Postgres, dan Storage privat dengan Row Level Security untuk data lintas perangkat.
+- Tanpa framework runtime: antarmuka memakai HTML, CSS, dan JavaScript murni.
 
 ## Menjalankan lokal
 

@@ -6,6 +6,7 @@ const SUPABASE_URL = 'https://qrxmrvfuveoioxqtylbt.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_A3DO8McXarFCJJvpREJ-9w_v54YXH0I';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 let signedInUser = null;
+let currentProfile = null;
 const qrTokens = new Map();
 
 const helmChecks = [
@@ -30,6 +31,13 @@ const shoeChecks = [
 ];
 const aparChecks = checks;
 const originalDraw = draw;
+const originalList = list;
+const originalDetail = detail;
+const originalResult = result;
+
+function isSupervisor() {
+  return currentProfile?.role === 'supervisor';
+}
 
 function activeChecks() {
   if (chosen && chosen[I.type] === 'Helm Safety') return helmChecks;
@@ -47,11 +55,106 @@ checklist = function (app) {
 };
 
 draw = function () {
+  if (view === 'assetManage') return assetManager(document.querySelector('#app'));
   originalDraw();
+  renderRoleControls();
   requestAnimationFrame(() => {
     if (view === 'detail') renderRealQr();
   });
 };
+
+list = function (app) {
+  originalList(app);
+};
+
+detail = function (app) {
+  originalDetail(app);
+};
+
+result = function (app) {
+  originalResult(app);
+  const closeButton = [...app.querySelectorAll('button')].find(button => button.textContent.includes('Tandai tindak lanjut selesai'));
+  if (closeButton && !isSupervisor()) closeButton.remove();
+};
+
+function renderRoleControls() {
+  const subtitle = document.querySelector('.subside');
+  if (subtitle && signedInUser) {
+    const roleLabel = isSupervisor() ? 'Supervisor' : 'Inspector';
+    subtitle.innerHTML = `Sistem Inspeksi Alat K3<br><span style="color:#c5daf7">${esc(currentProfile?.full_name || signedInUser.email)} · ${roleLabel}</span><button onclick="signOutSafetyOps()" style="display:block;border:0;background:transparent;color:#94add0;padding:8px 0 0;font:inherit;cursor:pointer">Keluar</button>`;
+  }
+  if (view === 'assets' && isSupervisor()) {
+    const header = document.querySelector('#app .top');
+    const primary = header?.querySelector(':scope > .btn');
+    if (header && primary && !document.querySelector('#add-asset-button')) {
+      const controls = document.createElement('div');
+      controls.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
+      controls.innerHTML = '<button class="btn outline" id="add-asset-button" onclick="openAssetManager()">+ Tambah aset</button>';
+      primary.replaceWith(controls);
+      controls.append(primary);
+    }
+  }
+  if (view === 'detail' && isSupervisor() && !document.querySelector('#archive-asset-button')) {
+    const printButton = [...document.querySelectorAll('button')].find(button => button.textContent.trim() === 'Cetak label');
+    if (printButton) {
+      const archiveButton = document.createElement('button');
+      archiveButton.id = 'archive-asset-button';
+      archiveButton.className = 'btn outline';
+      archiveButton.style.cssText = 'display:block;width:100%;margin-top:8px;color:#9f2d23';
+      archiveButton.textContent = 'Arsipkan aset';
+      archiveButton.onclick = archiveChosenAsset;
+      printButton.parentElement.insertBefore(archiveButton, printButton);
+    }
+  }
+}
+
+function openAssetManager() {
+  if (!isSupervisor()) return showMessage('Hanya supervisor yang dapat menambahkan aset.', 'error');
+  view = 'assetManage';
+  draw();
+}
+
+function assetManager(app) {
+  if (!isSupervisor()) { view = 'assets'; return draw(); }
+  app.innerHTML = `<button class="back" onclick="go('assets')">← Kembali ke daftar alat</button>${head('Tambah aset K3', 'Supervisor mendaftarkan aset baru. Sistem akan membuat identitas QR unik secara otomatis.')}
+    <div class="panel" style="max-width:780px"><div class="body"><div class="hint"><b>Catatan audit.</b> Aset tidak dihapus permanen. Jika sudah tidak digunakan, arsipkan aset dari halaman detail.</div>
+    <form id="asset-form" onsubmit="saveAsset(event)"><div class="grid two"><label>Kode aset<input class="field" style="width:100%;margin-top:5px" name="asset_code" required maxlength="50" placeholder="Contoh: APAR-RKT-02"></label><label>Jenis alat<select class="field" style="width:100%;margin-top:5px" name="equipment_type" required><option value="APAR">APAR</option><option value="Helm Safety">Helm Safety</option><option value="Sepatu Safety">Sepatu Safety</option></select></label><label>Nama aset<input class="field" style="width:100%;margin-top:5px" name="name" required maxlength="160" placeholder="Contoh: APAR Dry Chemical 3 kg"></label><label>Lokasi<input class="field" style="width:100%;margin-top:5px" name="location" required maxlength="160" placeholder="Contoh: Area Produksi A"></label></div><label style="display:block;margin-top:14px">Detail lokasi<input class="field" style="width:100%;margin-top:5px" name="location_detail" maxlength="250" placeholder="Contoh: Dekat Panel A-03"></label><div class="actions"><button type="button" class="btn outline" onclick="go('assets')">Batal</button><button class="btn" type="submit">Simpan & buat QR</button></div></form></div></div>`;
+}
+
+async function saveAsset(event) {
+  event.preventDefault();
+  if (!isSupervisor()) return showMessage('Hanya supervisor yang dapat menambahkan aset.', 'error');
+  const form = event.currentTarget;
+  const values = Object.fromEntries(new FormData(form));
+  const insert = await sb.from('assets').insert({
+    asset_code: values.asset_code.trim().toUpperCase(), name: values.name.trim(), equipment_type: values.equipment_type,
+    location: values.location.trim(), location_detail: values.location_detail.trim() || null,
+    next_inspection_at: new Date().toISOString().slice(0, 10)
+  }).select().single();
+  if (insert.error) return showMessage(insert.error.code === '23505' ? 'Kode aset sudah dipakai. Gunakan kode lain.' : 'Aset belum dapat disimpan. Periksa data lalu coba lagi.', 'error');
+  await loadRemoteData();
+  chosen = assets.find(asset => asset[I.id] === insert.data.id) || assets[0];
+  view = 'detail';
+  draw();
+  showMessage('Aset tersimpan. QR unik siap diunduh dari detail aset.');
+}
+
+async function archiveChosenAsset() {
+  if (!isSupervisor()) return showMessage('Hanya supervisor yang dapat mengarsipkan aset.', 'error');
+  if (!window.confirm(`Arsipkan ${chosen[I.code]}? Riwayat inspeksi tetap tersimpan dan aset dapat dipulihkan dari database.`)) return;
+  const archived = await sb.from('assets').update({ is_archived: true, archived_at: new Date().toISOString() }).eq('id', chosen[I.id]);
+  if (archived.error) return showMessage('Aset belum dapat diarsipkan.', 'error');
+  view = 'assets';
+  await loadRemoteData();
+  showMessage('Aset diarsipkan. Riwayat inspeksinya tidak dihapus.');
+}
+
+async function signOutSafetyOps() {
+  await sb.auth.signOut();
+  signedInUser = null;
+  currentProfile = null;
+  showAuth();
+}
 
 function renderRealQr() {
   const holder = document.querySelector('.qr');
@@ -149,17 +252,20 @@ function formatDate(value) {
 
 async function loadRemoteData() {
   try {
-    const [assetResult, followResult, inspectionResult] = await Promise.all([
+    const [profileResult, assetResult, followResult, inspectionResult] = await Promise.all([
+      sb.from('profiles').select('full_name,role').eq('id', signedInUser.id).single(),
       sb.from('assets').select('*').order('asset_code'),
       sb.from('follow_ups').select('asset_id,status,recommendation,created_at').order('created_at', { ascending: false }),
       sb.from('inspections').select('*,assets(asset_code,name),inspection_answers(*),inspection_photos(storage_path,captured_at),follow_ups(status)').order('submitted_at', { ascending: false })
     ]);
+    if (profileResult.error) throw profileResult.error;
     if (assetResult.error) throw assetResult.error;
     if (inspectionResult.error) throw inspectionResult.error;
+    currentProfile = profileResult.data;
     const latestFollow = new Map();
     (followResult.data || []).forEach(row => { if (!latestFollow.has(row.asset_id)) latestFollow.set(row.asset_id, row); });
     qrTokens.clear();
-    const remoteAssets = assetResult.data.map(row => {
+    const remoteAssets = (assetResult.data || []).filter(row => !row.is_archived).map(row => {
       const follow = latestFollow.get(row.id);
       qrTokens.set(row.id, row.qr_token);
       return [row.id, row.asset_code, row.name, row.equipment_type, row.location, row.location_detail || '—', row.current_condition, row.inspection_status, formatDate(row.last_inspected_at), row.next_inspection_at || '—', 'Petugas K3', follow?.recommendation || 'Tidak ada', follow?.status || 'Tidak ada'];
