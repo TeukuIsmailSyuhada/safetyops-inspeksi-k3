@@ -12,6 +12,16 @@ MVP aplikasi inspeksi alat K3 berbasis QR untuk mini hackathon. Aplikasi membant
 - Checklist APAR, catatan temuan, review, dan status berbasis aturan.
 - Riwayat inspeksi serta rekap kondisi alat.
 
+## Backend Supabase
+
+Versi terintegrasi memakai Supabase untuk login, database, foto privat, dan data lintas perangkat.
+
+1. Jalankan file SQL berurutan di folder [supabase](supabase/): `001_initial_schema.sql`, lalu `003_inspection_automation.sql`.
+2. Pastikan provider **Email** aktif di Supabase Authentication.
+3. Tambahkan URL aplikasi lokal dan domain Vercel ke **Authentication → URL Configuration** sebelum mendaftarkan akun pertama.
+
+Publishable key Supabase dipakai di aplikasi browser dan aman hanya karena seluruh tabel serta Storage dilindungi Row Level Security. Jangan pernah menambahkan `service_role` atau database password ke aplikasi maupun GitHub.
+
 ## Teknologi
 
 - HTML5, CSS3, dan Vanilla JavaScript.
@@ -40,7 +50,7 @@ Lalu buka alamat yang ditampilkan, biasanya `http://localhost:3000`.
 
 - Status alat ditentukan secara **rule-based dari checklist**, bukan dari AI atau analisis foto.
 - Foto adalah bukti dokumentasi inspeksi.
-- Mode scan QR pada MVP adalah simulasi; decoder QR produksi dapat ditambahkan pada tahap berikutnya.
+- Detail aset menampilkan QR asli yang dapat diunduh. QR membuka deep link aset; scan memakai kamera bawaan HP adalah cara demo paling stabil.
 - Jangan gunakan aplikasi ini sebagai pengganti SOP resmi atau keputusan profesional K3.
 
 Panduan presentasi lengkap tersedia di [docs/PANDUAN_DEMO_SAFETYOPS_INSPECT.md](docs/PANDUAN_DEMO_SAFETYOPS_INSPECT.md).
