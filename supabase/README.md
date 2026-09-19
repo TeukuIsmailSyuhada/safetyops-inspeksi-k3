@@ -5,6 +5,7 @@
 1. Buka **SQL Editor** pada project `safetyops-inspect`.
 2. Buat query baru.
 3. Salin seluruh isi file [001_initial_schema.sql](001_initial_schema.sql), lalu klik **Run** sekali.
+   - Jika muncul error `operator does not exist: text = uuid`, jangan jalankan ulang file pertama. Jalankan file [002_finish_storage_and_seed.sql](002_finish_storage_and_seed.sql) sekali untuk menyelesaikan bagian Storage dan data demo.
 4. Buka **Authentication → Providers → Email** dan pastikan Email aktif.
 5. Buka **Authentication → URL Configuration**.
    - Tambahkan URL lokal: `http://127.0.0.1:4173`

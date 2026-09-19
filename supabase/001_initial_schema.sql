@@ -213,14 +213,14 @@ create policy "Users upload their own evidence"
 on storage.objects for insert to authenticated
 with check (
   bucket_id = 'inspection-evidence'
-  and owner_id = auth.uid()
+  and owner_id = auth.uid()::text
 );
 
 create policy "Users delete their own evidence"
 on storage.objects for delete to authenticated
 using (
   bucket_id = 'inspection-evidence'
-  and owner_id = auth.uid()
+  and owner_id = auth.uid()::text
 );
 
 -- Data awal untuk demo: tiga objek 3D yang akan diberi label QR.
