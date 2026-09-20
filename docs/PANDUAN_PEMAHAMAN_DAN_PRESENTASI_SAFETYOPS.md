@@ -131,6 +131,42 @@ Kalimat demo:
 
 **Framework:** aplikasi ini tidak memakai React, Vue, atau Angular pada runtime. Ini adalah aplikasi statis menggunakan **Vanilla JavaScript**. Pilihan ini sesuai mini hackathon dua hari: ringan, cepat dideploy, dan fokus membuktikan alur bisnis.
 
+### Cara menjelaskan tools saat demo
+
+Gunakan kalimat ini:
+
+> “Frontend SafetyOps dibuat dengan HTML, CSS, dan Vanilla JavaScript. Frontend
+> menangani tampilan dashboard, login, QR, kamera, checklist, dan navigasi.
+> Backend menggunakan Supabase untuk autentikasi, database PostgreSQL, dan
+> penyimpanan foto. Vercel digunakan untuk hosting website sekaligus menjalankan
+> endpoint backend kecil untuk rekomendasi AI. OpenAI digunakan untuk merangkum
+> temuan dan membuat draf rekomendasi tindak lanjut. Database tetap menentukan
+> status checklist dan hak akses melalui RLS.”
+
+### Pembagian frontend dan backend
+
+| Lapisan | Komponen | Tanggung jawab |
+| --- | --- | --- |
+| Frontend | HTML5, CSS3, Vanilla JavaScript | Menampilkan halaman, menerima input, membuka kamera, membuat QR, menjalankan aturan status, dan mengirim data. |
+| Backend data | Supabase Auth + Postgres + Storage | Login, role, data aset, inspeksi, jawaban, foto privat, dan tindak lanjut. |
+| Backend AI | Vercel Function `/api/ai-recommendation` | Memverifikasi sesi, menjaga API key, mengirim ringkasan checklist ke OpenAI, dan mengembalikan hasil terstruktur. |
+| AI service | OpenAI Responses API dengan `gpt-5-mini` | Membuat ringkasan temuan, prioritas, tindakan, dan dasar rekomendasi. |
+| Hosting | Vercel | Menayangkan frontend melalui HTTPS dan menjalankan Vercel Function. |
+
+### Alur data saat rekomendasi AI
+
+    Inspector mengisi checklist
+           -> Supabase menyimpan inspeksi terlebih dahulu
+           -> frontend mengirim data checklist tanpa foto
+           -> Vercel Function memverifikasi sesi login
+           -> OpenAI membuat draf rekomendasi
+           -> hasil tampil di halaman Hasil Inspeksi
+           -> Supervisor memverifikasi dan menutup tindak lanjut
+
+Tekankan bahwa **AI tidak menghitung status akhir alat**. Status `Baik`, `Perlu
+Perhatian`, `Perlu Perbaikan`, atau `Tidak Layak Digunakan` tetap dihitung dari
+aturan checklist. AI hanya membantu merangkum temuan dan menyusun draf tindakan.
+
 ## 6. Arsitektur sederhana
 
     Browser: HTML + CSS + JavaScript
