@@ -31,6 +31,16 @@ const shoeChecks = [
     ['laces', 'Tali dan pengunci', 'Tali sepatu atau pengunci berfungsi baik.', ['Baik', 'Perlu Perhatian', 'Tidak Baik']]
   ]]
 ];
+const arcFlashChecks = [
+  ['Kondisi Pakaian', [
+    ['fabric', 'Material pelindung', 'Tidak robek, berlubang, terbakar, atau terkontaminasi bahan berbahaya.', ['Baik', 'Perlu Perhatian', 'Tidak Baik']],
+    ['closure', 'Jahitan dan penutup', 'Jahitan, ritsleting, kancing, dan penutup utuh serta berfungsi.', ['Baik', 'Perlu Perhatian', 'Tidak Baik']]
+  ]],
+  ['Identifikasi dan Penyimpanan', [
+    ['rating', 'Label arc rating dan ukuran', 'Label arc rating serta ukuran terbaca dan sesuai kebutuhan pekerjaan.', ['Berlaku', 'Mendekati jatuh tempo', 'Lewat jatuh tempo']],
+    ['storage', 'Kebersihan dan penyimpanan', 'Pakaian bersih, kering, dan disimpan sesuai ketentuan.', ['Baik', 'Perlu Perhatian', 'Tidak Baik']]
+  ]]
+];
 const aparChecks = checks;
 const originalDraw = draw;
 const originalList = list;
@@ -44,6 +54,7 @@ function isSupervisor() {
 function activeChecks() {
   if (chosen && chosen[I.type] === 'Helm Safety') return helmChecks;
   if (chosen && chosen[I.type] === 'Sepatu Safety') return shoeChecks;
+  if (chosen && chosen[I.type] === 'Arc Flash Suit') return arcFlashChecks;
   return aparChecks;
 }
 
@@ -128,7 +139,7 @@ function assetManager(app) {
   if (!isSupervisor()) { view = 'assets'; return draw(); }
   app.innerHTML = `<button class="back" onclick="go('assets')">← Kembali ke daftar alat</button>${head('Tambah aset K3', 'Supervisor mendaftarkan aset baru. Sistem akan membuat identitas QR unik secara otomatis.')}
     <div class="panel" style="max-width:780px"><div class="body"><div class="hint"><b>Catatan audit.</b> Aset tidak dihapus permanen. Jika sudah tidak digunakan, arsipkan aset dari halaman detail.</div>
-    <form id="asset-form" onsubmit="saveAsset(event)"><div class="grid two"><label>Kode aset<input class="field" style="width:100%;margin-top:5px" name="asset_code" required maxlength="50" placeholder="Contoh: APAR-RKT-02"></label><label>Jenis alat<select class="field" style="width:100%;margin-top:5px" name="equipment_type" required><option value="APAR">APAR</option><option value="Helm Safety">Helm Safety</option><option value="Sepatu Safety">Sepatu Safety</option></select></label><label>Nama aset<input class="field" style="width:100%;margin-top:5px" name="name" required maxlength="160" placeholder="Contoh: APAR Dry Chemical 3 kg"></label><label>Lokasi<input class="field" style="width:100%;margin-top:5px" name="location" required maxlength="160" placeholder="Contoh: Area Produksi A"></label></div><label style="display:block;margin-top:14px">Detail lokasi<input class="field" style="width:100%;margin-top:5px" name="location_detail" maxlength="250" placeholder="Contoh: Dekat Panel A-03"></label><div class="actions"><button type="button" class="btn outline" onclick="go('assets')">Batal</button><button class="btn" type="submit">Simpan & buat QR</button></div></form></div></div>`;
+    <form id="asset-form" onsubmit="saveAsset(event)"><div class="grid two"><label>Kode aset<input class="field" style="width:100%;margin-top:5px" name="asset_code" required maxlength="50" placeholder="Contoh: APAR-RKT-02"></label><label>Jenis alat<select class="field" style="width:100%;margin-top:5px" name="equipment_type" required><option value="APAR">APAR</option><option value="Helm Safety">Helm Safety</option><option value="Sepatu Safety">Sepatu Safety</option><option value="Arc Flash Suit">Arc Flash Suit</option></select></label><label>Nama aset<input class="field" style="width:100%;margin-top:5px" name="name" required maxlength="160" placeholder="Contoh: APAR Dry Chemical 3 kg"></label><label>Lokasi<input class="field" style="width:100%;margin-top:5px" name="location" required maxlength="160" placeholder="Contoh: Area Produksi A"></label></div><label style="display:block;margin-top:14px">Detail lokasi<input class="field" style="width:100%;margin-top:5px" name="location_detail" maxlength="250" placeholder="Contoh: Dekat Panel A-03"></label><div class="actions"><button type="button" class="btn outline" onclick="go('assets')">Batal</button><button class="btn" type="submit">Simpan & buat QR</button></div></form></div></div>`;
 }
 
 async function saveAsset(event) {

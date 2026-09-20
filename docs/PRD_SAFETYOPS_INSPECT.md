@@ -4,7 +4,7 @@
 
 SafetyOps Inspect adalah MVP web untuk inspeksi alat K3 berbasis QR pada mini hackathon dua hari. Petugas menemukan aset melalui QR, mengambil foto kondisi memakai kamera perangkat, mengisi checklist, lalu menyimpan hasil inspeksi dan tindak lanjut ke Supabase.
 
-Objek demo: **APAR**, **helm safety**, dan **sepatu safety**.
+Objek demo utama: **APAR**, **helm safety**, dan **sepatu safety**. Supervisor juga dapat menambahkan **Arc Flash Suit** dengan QR dan checklist khusus sebagai pembuktian fitur Create.
 
 ## 2. Masalah yang diselesaikan
 
@@ -38,7 +38,7 @@ Aturan keamanan: akun baru selalu berperan sebagai **Inspector**. Pilihan role d
 
 ### B. CRUD aman
 
-- **Create:** Supervisor menambahkan APAR/helm/sepatu. Database membuat `qr_token` unik; aplikasi menampilkan dan mengunduh QR PNG.
+- **Create:** Supervisor menambahkan APAR/helm/sepatu/Arc Flash Suit. Database membuat `qr_token` unik; aplikasi menampilkan dan mengunduh QR PNG.
 - **Read:** Semua pengguna login melihat aset, kondisi, riwayat, dan tindak lanjut.
 - **Update:** Inspector menambah record inspeksi baru (append-only). Supervisor memperbarui/menutup tindak lanjut dan mengarsipkan aset.
 - **Delete:** Tidak ada hapus inspeksi. Aset tidak dihapus permanen; gunakan `is_archived` dan `archived_at`.
