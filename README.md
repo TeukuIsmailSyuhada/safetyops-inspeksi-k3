@@ -24,6 +24,13 @@ Versi terintegrasi memakai Supabase untuk login, database, foto privat, dan data
 
 Publishable key Supabase dipakai di aplikasi browser dan aman hanya karena seluruh tabel serta Storage dilindungi Row Level Security. Jangan pernah menambahkan `service_role` atau database password ke aplikasi maupun GitHub.
 
+## Peran saat login
+
+- Pada layar **Masuk**, pengguna memilih mode `Inspector` atau `Supervisor`.
+- Pilihan tersebut harus sesuai dengan role akun pada Supabase; pilihan di browser tidak dapat menaikkan hak akses.
+- Akun baru selalu dibuat sebagai **Inspector**. Supervisor ditetapkan sekali lewat SQL pada profil akun yang sudah terdaftar.
+- Inspector melihat tombol kelola aset dan tutup tindak lanjut dalam keadaan abu-abu/nonaktif. Kebijakan RLS tetap menjadi perlindungan utama bila ada upaya memanggil API secara langsung.
+
 ## Teknologi
 
 - HTML5, CSS3, dan Vanilla JavaScript.
