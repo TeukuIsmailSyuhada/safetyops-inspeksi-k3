@@ -18,7 +18,7 @@ MVP aplikasi inspeksi alat K3 berbasis QR untuk mini hackathon. Aplikasi membant
 
 Versi terintegrasi memakai Supabase untuk login, database, foto privat, dan data lintas perangkat.
 
-1. Jalankan file SQL berurutan di folder [supabase](supabase/): `001_initial_schema.sql`, `003_inspection_automation.sql`, lalu `004_asset_lifecycle.sql`.
+1. Jalankan file SQL berurutan di folder [supabase](supabase/): `001_initial_schema.sql`, `003_inspection_automation.sql`, `004_asset_lifecycle.sql`, lalu `005_atomic_inspection_submit.sql`.
 2. Pastikan provider **Email** aktif di Supabase Authentication.
 3. Tambahkan URL aplikasi lokal dan domain Vercel ke **Authentication → URL Configuration** sebelum mendaftarkan akun pertama.
 
@@ -63,3 +63,4 @@ Lalu buka alamat yang ditampilkan, biasanya `http://localhost:3000`.
 - Jangan gunakan aplikasi ini sebagai pengganti SOP resmi atau keputusan profesional K3.
 
 Panduan presentasi lengkap tersedia di [docs/PANDUAN_DEMO_SAFETYOPS_INSPECT.md](docs/PANDUAN_DEMO_SAFETYOPS_INSPECT.md).
+Gunakan [docs/PRA_DEMO_CHECKLIST.md](docs/PRA_DEMO_CHECKLIST.md) sebelum demo untuk memverifikasi database, akun, dan alur inspeksi.

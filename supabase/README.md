@@ -8,12 +8,13 @@
    - Jika muncul error `operator does not exist: text = uuid`, jangan jalankan ulang file pertama. Jalankan file [002_finish_storage_and_seed.sql](002_finish_storage_and_seed.sql) sekali untuk menyelesaikan bagian Storage dan data demo.
 4. Setelah 001 berhasil, jalankan [003_inspection_automation.sql](003_inspection_automation.sql) sekali agar hasil inspeksi otomatis memperbarui kondisi alat.
 5. Jalankan [004_asset_lifecycle.sql](004_asset_lifecycle.sql) sekali agar fitur arsip aset aktif dan browser tidak dapat menghapus aset permanen.
-5. Buka **Authentication → Providers → Email** dan pastikan Email aktif.
-6. Buka **Authentication → URL Configuration**.
+6. Jalankan [005_atomic_inspection_submit.sql](005_atomic_inspection_submit.sql) sekali. File ini mengganti trigger pembaruan kondisi aset dengan fungsi `submit_inspection` yang menyimpan inspeksi, jawaban, foto, dan tindak lanjut dalam satu transaksi — supaya kondisi aset tidak pernah berubah tanpa checklist/foto yang lengkap tersimpan.
+7. Buka **Authentication → Providers → Email** dan pastikan Email aktif.
+8. Buka **Authentication → URL Configuration**.
    - Tambahkan URL lokal: `http://127.0.0.1:4173`
    - Setelah Vercel selesai, tambahkan URL produksi Vercel, misalnya `https://nama-project.vercel.app`.
-6. Login satu kali ke aplikasi nanti menggunakan email kamu.
-7. Jalankan perintah `update public.profiles ...` yang ada di bagian akhir file SQL untuk menjadikan akun kamu sebagai `supervisor`.
+9. Login satu kali ke aplikasi nanti menggunakan email kamu.
+10. Jalankan perintah `update public.profiles ...` yang ada di bagian akhir file SQL untuk menjadikan akun kamu sebagai `supervisor`.
 
 ## Aturan keamanan yang dipasang
 

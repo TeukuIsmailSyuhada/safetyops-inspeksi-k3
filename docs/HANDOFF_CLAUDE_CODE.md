@@ -4,6 +4,8 @@
 
 Lanjutkan pengembangan MVP inspeksi alat K3 berbasis QR tanpa mengubah keputusan produk dan keamanan yang sudah disepakati. Baca terlebih dahulu [PRD_SAFETYOPS_INSPECT.md](PRD_SAFETYOPS_INSPECT.md).
 
+> **Sebelum demo:** kerjakan [PRA_DEMO_CHECKLIST.md](PRA_DEMO_CHECKLIST.md) lebih dulu. Di sana ada query SQL yang wajib dijalankan di Supabase — tanpa itu submit inspeksi akan gagal.
+
 ## Stack dan struktur proyek
 
 - Frontend: HTML5, CSS3, Vanilla JavaScript; aplikasi SPA statis.
@@ -24,6 +26,7 @@ Lanjutkan pengembangan MVP inspeksi alat K3 berbasis QR tanpa mengubah keputusan
 | `supabase/002_finish_storage_and_seed.sql` | Pemulihan Storage/seed jika migrasi awal pernah gagal. |
 | `supabase/003_inspection_automation.sql` | Trigger pembaruan kondisi aset setelah inspeksi. |
 | `supabase/004_asset_lifecycle.sql` | Archive aset dan larangan hard delete dari browser. |
+| `supabase/005_atomic_inspection_submit.sql` | Fungsi `submit_inspection` — submit inspeksi (jawaban, foto, tindak lanjut, update kondisi aset) dalam satu transaksi atomik. |
 | `supabase/README.md` | Langkah setup Supabase. |
 | `vercel.json` | Konfigurasi deploy statis Vercel. |
 
@@ -40,7 +43,7 @@ Lanjutkan pengembangan MVP inspeksi alat K3 berbasis QR tanpa mengubah keputusan
 
 ## Setup Supabase yang harus tetap ada
 
-1. Jalankan SQL berurutan: `001`, `003`, lalu `004`. Jalankan `002` hanya jika kasus error awal yang dijelaskan pada `supabase/README.md` terjadi.
+1. Jalankan SQL berurutan: `001`, `003`, `004`, lalu `005`. Jalankan `002` hanya jika kasus error awal yang dijelaskan pada `supabase/README.md` terjadi.
 2. Aktifkan Email provider di Supabase Auth.
 3. Isi Site URL dan Redirect URL untuk domain Vercel serta `http://127.0.0.1:4173`.
 4. Buat dua akun demo berbeda:

@@ -87,7 +87,7 @@ function renderRoleControls() {
   const subtitle = document.querySelector('.subside');
   if (subtitle && signedInUser) {
     const roleLabel = isSupervisor() ? 'Supervisor' : 'Inspector';
-    subtitle.innerHTML = `Sistem Inspeksi Alat K3<br><span style="color:#c5daf7">${esc(currentProfile?.full_name || signedInUser.email)} · ${roleLabel}</span><button onclick="signOutSafetyOps()" style="display:block;border:0;background:transparent;color:#94add0;padding:8px 0 0;font:inherit;cursor:pointer">Keluar</button>`;
+    subtitle.innerHTML = `Sistem Inspeksi Alat K3<br><span style="color:#f2b705;font-weight:600">${esc(currentProfile?.full_name || signedInUser.email)} · ${roleLabel}</span><button onclick="signOutSafetyOps()" style="display:block;border:0;background:transparent;color:#8a94a6;padding:8px 0 0;font:inherit;cursor:pointer">Keluar</button>`;
   }
   if (view === 'assets') {
     const header = document.querySelector('#app .top');
@@ -108,7 +108,7 @@ function renderRoleControls() {
       const archiveButton = document.createElement('button');
       archiveButton.id = 'archive-asset-button';
       archiveButton.className = 'btn outline';
-      archiveButton.style.cssText = 'display:block;width:100%;margin-top:8px;color:#9f2d23';
+      archiveButton.style.cssText = 'display:block;width:100%;margin-top:8px;color:#b91c1c';
       archiveButton.textContent = isSupervisor() ? 'Arsipkan aset' : 'Arsipkan aset · Supervisor';
       archiveButton.disabled = !isSupervisor();
       archiveButton.title = isSupervisor() ? '' : 'Akses ini tersedia untuk akun Supervisor.';
@@ -198,28 +198,13 @@ function downloadQr() {
   link.click();
 }
 
-function injectAuthStyle() {
-  if (document.querySelector('#auth-style')) return;
-  document.head.insertAdjacentHTML('beforeend', `<style id="auth-style">
-    .auth-cover{position:fixed;inset:0;background:#10213be8;z-index:20;display:grid;place-items:center;padding:18px}
-    .auth-box{width:min(430px,100%);background:#fff;border-radius:8px;padding:25px;border:1px solid #d9e2ee;box-shadow:0 18px 50px #0005}
-    .auth-box h1{font-size:22px;margin:0 0 5px}.auth-box p{color:#61718a;margin:0 0 18px}.auth-box label{display:block;font-size:12px;font-weight:700;margin:12px 0 5px}.auth-box input{width:100%;height:42px;border:1px solid #c8d4e1;border-radius:4px;padding:0 10px}.auth-help{font-size:12px;color:#61718a;margin-top:12px}.auth-error{min-height:18px;color:#b42318;font-size:12px;margin-top:10px}
-  </style>`);
-}
-
-function showAuth(message = '') {
-  injectAuthStyle();
-  document.querySelector('#auth-cover')?.remove();
-  document.body.insertAdjacentHTML('beforeend', `<div class="auth-cover" id="auth-cover"><div class="auth-box"><div class="brand" style="color:#152238;padding:0"><span class="logo">✓</span>SafetyOps Inspect</div><h1 style="margin-top:18px">Masuk untuk mulai inspeksi</h1><p>Gunakan akun petugas agar data inspeksi tersimpan dan dapat dipakai lintas perangkat.</p><label for="auth-name">Nama lengkap <span style="font-weight:400">(saat daftar)</span></label><input id="auth-name" autocomplete="name" placeholder="Nama petugas"><label for="auth-email">Email</label><input id="auth-email" type="email" autocomplete="email" placeholder="nama@perusahaan.com"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" minlength="8" placeholder="Minimal 8 karakter"><div class="auth-error" id="auth-error">${esc(message)}</div><div class="actions" style="margin-top:12px"><button class="btn outline" onclick="authSubmit('signup')">Daftar</button><button class="btn" onclick="authSubmit('login')">Masuk</button></div><div class="auth-help">Saat pendaftaran pertama, cek email verifikasi dari Supabase. Password dan service key tidak pernah disimpan di website.</div></div></div>`);
-}
-
 function injectLandingAuthStyle() {
   if (document.querySelector('#auth-landing-style')) return;
   document.head.insertAdjacentHTML('beforeend', `<style id="auth-landing-style">
-    .auth-cover{position:fixed;inset:0;z-index:20;overflow:auto;background:#eef3f9;padding:28px}
-    .auth-layout{width:min(1080px,100%);min-height:620px;margin:auto;display:grid;grid-template-columns:1.08fr .92fr;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 24px 70px #10213b24;border:1px solid #d9e2ee}
-    .auth-hero{padding:56px 54px;background:linear-gradient(145deg,#10213b,#1b4f8e);color:#fff;display:flex;flex-direction:column;justify-content:center}.auth-hero .brand{padding:0}.auth-kicker{color:#a9cdfb;font-size:12px;font-weight:800;letter-spacing:.1em;margin:34px 0 12px}.auth-hero h1{font-size:38px;line-height:1.12;letter-spacing:-.035em;margin:0 0 16px}.auth-hero p{margin:0;color:#d4e5fb;max-width:430px}.auth-points{display:grid;gap:14px;margin:34px 0 0;padding:0;list-style:none}.auth-points li{display:flex;gap:10px;align-items:flex-start;color:#e7f1ff}.auth-points b{display:grid;place-items:center;flex:0 0 22px;height:22px;border-radius:50%;background:#2d80ef;color:#fff;font-size:13px}
-    .auth-box{padding:52px 48px;display:flex;flex-direction:column;justify-content:center}.auth-box h2{font-size:27px;letter-spacing:-.025em;margin:0 0 6px}.auth-box>p{color:#61718a;margin:0 0 22px}.auth-switch{display:grid;grid-template-columns:1fr 1fr;background:#f1f5f9;border-radius:7px;padding:4px;margin-bottom:20px}.auth-switch button{border:0;border-radius:5px;background:transparent;color:#61718a;padding:9px;cursor:pointer;font-weight:700}.auth-switch button.active{background:#fff;color:#1769e0;box-shadow:0 1px 3px #10213b1a}.auth-role-label{font-size:12px;font-weight:750;margin:0 0 7px}.auth-role{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:17px}.auth-role button{min-height:57px;text-align:left;border:1px solid #c8d4e1;background:#fff;border-radius:6px;padding:9px 10px;cursor:pointer;color:#40536d;font-weight:750}.auth-role button span{display:block;font-size:11px;color:#6e819c;font-weight:400;margin-top:2px}.auth-role button.active{border-color:#2879ee;background:#eef6ff;color:#1457af;box-shadow:inset 0 0 0 1px #2879ee}.auth-box label{display:block;font-size:12px;font-weight:700;margin:13px 0 5px}.auth-box input{width:100%;height:44px;border:1px solid #c8d4e1;border-radius:5px;padding:0 11px;background:#fff}.auth-box input:focus{outline:3px solid #bfdbfe;border-color:#2879ee}.auth-help{font-size:12px;color:#61718a;margin-top:15px;line-height:1.5}.auth-error{min-height:18px;color:#b42318;font-size:12px;margin-top:12px}.auth-submit{width:100%;margin-top:8px}.auth-note{font-size:11px;color:#7b8ca3;margin:20px 0 0;text-align:center}
+    .auth-cover{position:fixed;inset:0;z-index:20;overflow:auto;background:#e7e9ed;padding:28px;font-family:'IBM Plex Sans',"Segoe UI",Arial,sans-serif}
+    .auth-layout{width:min(1080px,100%);min-height:620px;margin:auto;display:grid;grid-template-columns:1.08fr .92fr;border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 24px 70px #10151f2e;border:1px solid #d9dce2}
+    .auth-hero{padding:56px 54px;background:#10151f;color:#fff;display:flex;flex-direction:column;justify-content:center;border-bottom:4px solid #f2b705}.auth-hero .brand{padding:0}.auth-kicker{color:#f2b705;font-size:12px;font-weight:800;letter-spacing:.1em;margin:34px 0 12px}.auth-hero h1{font-size:36px;line-height:1.14;letter-spacing:-.02em;margin:0 0 16px}.auth-hero p{margin:0;color:#c7cfdb;max-width:430px}.auth-points{display:grid;gap:14px;margin:34px 0 0;padding:0;list-style:none}.auth-points li{display:flex;gap:10px;align-items:flex-start;color:#dfe4ea}.auth-points b{display:grid;place-items:center;flex:0 0 22px;height:22px;border-radius:3px;background:#f2b705;color:#191307;font-size:13px;font-weight:900}
+    .auth-box{padding:52px 48px;display:flex;flex-direction:column;justify-content:center}.auth-box h2{font-size:26px;letter-spacing:-.015em;margin:0 0 6px;font-weight:700}.auth-box>p{color:#5b6472;margin:0 0 22px}.auth-switch{display:grid;grid-template-columns:1fr 1fr;background:#eef0f2;border-radius:3px;padding:4px;margin-bottom:20px}.auth-switch button{border:0;border-radius:2px;background:transparent;color:#5b6472;padding:9px;cursor:pointer;font-weight:700;min-height:38px}.auth-switch button.active{background:#fff;color:#151a21;box-shadow:0 1px 3px #10151f1a}.auth-role-label{font-size:12px;font-weight:750;margin:0 0 7px}.auth-role{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:17px}.auth-role button{min-height:57px;text-align:left;border:1px solid #c4ccd6;background:#fff;border-radius:3px;padding:9px 10px;cursor:pointer;color:#151a21;font-weight:750}.auth-role button span{display:block;font-size:11px;color:#5b6472;font-weight:400;margin-top:2px}.auth-role button.active{border-color:#f2b705;background:#fdf7e5;color:#151a21;box-shadow:inset 0 0 0 2px #f2b705}.auth-box label{display:block;font-size:12px;font-weight:700;margin:13px 0 5px}.auth-box input{width:100%;height:44px;border:1px solid #c4ccd6;border-radius:3px;padding:0 11px;background:#fff}.auth-box input:focus{outline:3px solid #1d4ed8;border-color:#1d4ed8}.auth-help{font-size:12px;color:#5b6472;margin-top:15px;line-height:1.5}.auth-error{min-height:18px;color:#b91c1c;font-size:12px;margin-top:12px}.auth-submit{width:100%;margin-top:8px}.auth-note{font-size:11px;color:#7b8494;margin:20px 0 0;text-align:center}
     @media(max-width:760px){.auth-cover{padding:0}.auth-layout{min-height:100vh;border:0;border-radius:0;display:block}.auth-hero{padding:30px 24px}.auth-kicker,.auth-points{display:none}.auth-hero h1{font-size:28px;margin-top:20px}.auth-box{padding:31px 24px}.auth-box h2{font-size:24px}}
   </style>`);
 }
@@ -228,7 +213,7 @@ showAuth = function (message = '', mode = 'login') {
   authMode = mode;
   injectLandingAuthStyle();
   document.querySelector('#auth-cover')?.remove();
-  document.body.insertAdjacentHTML('beforeend', `<section class="auth-cover" id="auth-cover" aria-label="Masuk SafetyOps Inspect"><div class="auth-layout"><aside class="auth-hero"><div class="brand"><span class="logo">✓</span>SafetyOps Inspect</div><span class="auth-kicker">SISTEM INSPEKSI ALAT K3</span><h1>Inspeksi lebih tertib, bukti lebih siap.</h1><p>Catat kondisi APAR, helm safety, dan sepatu safety secara konsisten dari perangkat apa pun.</p><ul class="auth-points"><li><b>1</b><span><strong>Scan QR aset</strong><br>Temukan identitas alat yang tepat.</span></li><li><b>2</b><span><strong>Foto & checklist</strong><br>Dokumentasi kondisi aktual di lapangan.</span></li><li><b>3</b><span><strong>Riwayat terlacak</strong><br>Data tersimpan aman untuk tindak lanjut.</span></li></ul></aside><main class="auth-box"><div class="brand" style="color:#152238;padding:0"><span class="logo">✓</span>SafetyOps</div><h2 id="auth-title" style="margin-top:26px">Masuk ke sistem</h2><p id="auth-description">Gunakan akun petugas yang sudah terdaftar.</p><div class="auth-switch"><button type="button" id="auth-login-tab" class="active" onclick="setAuthMode('login')">Masuk</button><button type="button" id="auth-signup-tab" onclick="setAuthMode('signup')">Daftar akun</button></div><form onsubmit="submitCurrentAuth(event)"><div id="auth-name-group" style="display:none"><label for="auth-name">Nama lengkap</label><input id="auth-name" autocomplete="name" placeholder="Nama petugas"></div><label for="auth-email">Email</label><input id="auth-email" type="email" autocomplete="email" required placeholder="nama@gmail.com"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" required minlength="8" placeholder="Minimal 8 karakter"><div class="auth-error" id="auth-error">${esc(message)}</div><button class="btn auth-submit" id="auth-submit" type="submit">Masuk</button></form><div class="auth-help">Gunakan email dan password. Saat daftar pertama kali, verifikasi email dari Supabase sebelum masuk.</div><p class="auth-note">Tidak memakai Google Login agar MVP tetap sederhana dan stabil.</p></main></div></section>`);
+  document.body.insertAdjacentHTML('beforeend', `<section class="auth-cover" id="auth-cover" aria-label="Masuk SafetyOps Inspect"><div class="auth-layout"><aside class="auth-hero"><div class="brand"><span class="logo">✓</span>SafetyOps Inspect</div><span class="auth-kicker">SISTEM INSPEKSI ALAT K3</span><h1>Inspeksi lebih tertib, bukti lebih siap.</h1><p>Catat kondisi APAR, helm safety, dan sepatu safety secara konsisten dari perangkat apa pun.</p><ul class="auth-points"><li><b>1</b><span><strong>Scan QR aset</strong><br>Temukan identitas alat yang tepat.</span></li><li><b>2</b><span><strong>Foto & checklist</strong><br>Dokumentasi kondisi aktual di lapangan.</span></li><li><b>3</b><span><strong>Riwayat terlacak</strong><br>Data tersimpan aman untuk tindak lanjut.</span></li></ul></aside><main class="auth-box"><div class="brand" style="color:#151a21;padding:0"><span class="logo">✓</span>SafetyOps</div><h2 id="auth-title" style="margin-top:26px">Masuk ke sistem</h2><p id="auth-description">Gunakan akun petugas yang sudah terdaftar.</p><div class="auth-switch"><button type="button" id="auth-login-tab" class="active" onclick="setAuthMode('login')">Masuk</button><button type="button" id="auth-signup-tab" onclick="setAuthMode('signup')">Daftar akun</button></div><form onsubmit="submitCurrentAuth(event)"><div id="auth-name-group" style="display:none"><label for="auth-name">Nama lengkap</label><input id="auth-name" autocomplete="name" placeholder="Nama petugas"></div><label for="auth-email">Email</label><input id="auth-email" type="email" autocomplete="email" required placeholder="nama@gmail.com"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" required minlength="8" placeholder="Minimal 8 karakter"><div class="auth-error" id="auth-error">${esc(message)}</div><button class="btn auth-submit" id="auth-submit" type="submit">Masuk</button></form><div class="auth-help">Gunakan email dan password. Saat daftar pertama kali, verifikasi email dari Supabase sebelum masuk.</div><p class="auth-note">Tidak memakai Google Login agar MVP tetap sederhana dan stabil.</p></main></div></section>`);
   document.querySelector('.auth-switch').insertAdjacentHTML('afterend', '<div id="auth-role-wrap"><p class="auth-role-label">Masuk sebagai</p><div class="auth-role"><button type="button" id="role-inspector" onclick="setRequestedRole(\'inspector\')">Inspector<span>Foto, checklist, dan inspeksi</span></button><button type="button" id="role-supervisor" onclick="setRequestedRole(\'supervisor\')">Supervisor<span>Kelola aset dan tindak lanjut</span></button></div></div>');
   setAuthMode(mode);
 };
@@ -279,7 +264,7 @@ async function authSubmit(mode) {
     return;
   }
   if (mode === 'signup' && !result.data.session) {
-    errorBox.style.color = '#137a47';
+    errorBox.style.color = '#15803d';
     errorBox.textContent = 'Pendaftaran berhasil. Buka email untuk verifikasi, lalu masuk.';
     return;
   }
@@ -312,8 +297,8 @@ function readableError(error) {
 
 function showMessage(message, type = 'info') {
   document.querySelector('#safetyops-message')?.remove();
-  const color = type === 'error' ? '#b42318' : '#24518b';
-  const background = type === 'error' ? '#fff0ef' : '#eef5ff';
+  const color = type === 'error' ? '#b91c1c' : '#1e3a8a';
+  const background = type === 'error' ? '#fbe7e7' : '#e8effc';
   document.body.insertAdjacentHTML('beforeend', `<div id="safetyops-message" style="position:fixed;right:16px;bottom:72px;z-index:30;max-width:360px;padding:11px 13px;border:1px solid ${color};border-radius:5px;background:${background};color:${color};font-size:13px">${esc(message)}</div>`);
   setTimeout(() => document.querySelector('#safetyops-message')?.remove(), 5000);
 }
@@ -376,35 +361,40 @@ submit = async function () {
   if (!signedInUser) return showAuth('Silakan masuk terlebih dahulu.');
   if (!photo) return showMessage('Foto kondisi alat wajib diambil sebelum submit.', 'error');
   view = 'process'; draw();
+  const capturedAt = new Date();
+  const path = `${signedInUser.id}/${chosen[I.id]}-${capturedAt.getTime()}.jpg`;
+  let uploadedPath = null;
   try {
     const condition = rule();
     const flaggedItems = items().filter(item => flagged(answers[item[0]]));
-    const capturedAt = new Date();
-    const inserted = await sb.from('inspections').insert({ asset_id: chosen[I.id], inspector_id: signedInUser.id, condition, finding_count: flaggedItems.length, captured_at: capturedAt.toISOString() }).select().single();
-    if (inserted.error) throw inserted.error;
-    const inspectionId = inserted.data.id;
-    const answerRows = items().map(item => ({ inspection_id: inspectionId, question_key: item[0], question_label: item[1], answer_value: answers[item[0]], is_flagged: flagged(answers[item[0]]), note: flagged(answers[item[0]]) ? notes[item[0]].trim() : null }));
-    const answersInserted = await sb.from('inspection_answers').insert(answerRows);
-    if (answersInserted.error) throw answersInserted.error;
+    const answerRows = items().map(item => ({ question_key: item[0], question_label: item[1], answer_value: answers[item[0]], is_flagged: flagged(answers[item[0]]), note: flagged(answers[item[0]]) ? notes[item[0]].trim() : null }));
     const blob = await (await fetch(photo)).blob();
-    const path = `${signedInUser.id}/${inspectionId}.jpg`;
     const uploaded = await sb.storage.from('inspection-evidence').upload(path, blob, { contentType: 'image/jpeg', upsert: false });
     if (uploaded.error) throw uploaded.error;
-    const photoInserted = await sb.from('inspection_photos').insert({ inspection_id: inspectionId, storage_path: path, captured_at: capturedAt.toISOString() });
-    if (photoInserted.error) throw photoInserted.error;
-    if (flaggedItems.length) {
-      const priority = condition === 'Tidak Layak Digunakan' ? 'Kritis' : condition === 'Perlu Perbaikan' ? 'Tinggi' : 'Sedang';
-      const recommendation = condition === 'Tidak Layak Digunakan' ? 'Hentikan penggunaan sementara dan lakukan perbaikan sebelum inspeksi ulang.' : 'Jadwalkan pemeriksaan/perbaikan komponen dan lakukan inspeksi ulang.';
-      const followInserted = await sb.from('follow_ups').insert({ asset_id: chosen[I.id], inspection_id: inspectionId, priority, recommendation, status: 'Terbuka' });
-      if (followInserted.error) throw followInserted.error;
-    }
-    record = { id: inspectionId, assetId: chosen[I.id], condition };
+    uploadedPath = path;
+    const priority = condition === 'Tidak Layak Digunakan' ? 'Kritis' : condition === 'Perlu Perbaikan' ? 'Tinggi' : 'Sedang';
+    const recommendation = condition === 'Tidak Layak Digunakan' ? 'Hentikan penggunaan sementara dan lakukan perbaikan sebelum inspeksi ulang.' : 'Jadwalkan pemeriksaan/perbaikan komponen dan lakukan inspeksi ulang.';
+    // Satu panggilan RPC atomik: inspeksi, jawaban, foto, tindak lanjut, dan
+    // pembaruan kondisi aset semuanya dalam satu transaksi Postgres — kalau
+    // satu langkah gagal, semuanya dibatalkan (lihat 005_atomic_inspection_submit.sql).
+    const rpc = await sb.rpc('submit_inspection', {
+      p_asset_id: chosen[I.id],
+      p_condition: condition,
+      p_captured_at: capturedAt.toISOString(),
+      p_photo_storage_path: path,
+      p_answers: answerRows,
+      p_priority: flaggedItems.length ? priority : null,
+      p_recommendation: flaggedItems.length ? recommendation : null
+    });
+    if (rpc.error) throw rpc.error;
+    record = { id: rpc.data, assetId: chosen[I.id], condition };
     await loadRemoteData();
     chosen = assets.find(asset => asset[I.id] === record.assetId) || chosen;
     view = 'result'; draw();
     showMessage('Inspeksi tersimpan dan dapat dilihat dari perangkat lain.');
   } catch (error) {
     console.error(error);
+    if (uploadedPath) await sb.storage.from('inspection-evidence').remove([uploadedPath]).catch(() => {});
     view = 'review'; draw();
     showMessage('Inspeksi belum tersimpan. Periksa koneksi dan coba submit kembali.', 'error');
   }
