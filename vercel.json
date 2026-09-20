@@ -5,6 +5,11 @@
   "installCommand": "",
   "outputDirectory": "static",
   "cleanUrls": true,
+  "functions": {
+    "api/ai-recommendation.js": {
+      "maxDuration": 20
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",

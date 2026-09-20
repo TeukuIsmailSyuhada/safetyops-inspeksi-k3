@@ -13,6 +13,7 @@ MVP aplikasi inspeksi alat K3 berbasis QR untuk mini hackathon. Aplikasi membant
 - Dokumentasi wajib melalui kamera perangkat; tidak mendukung unggah dari galeri.
 - Checklist APAR, catatan temuan, review, dan status berbasis aturan.
 - Riwayat inspeksi serta rekap kondisi alat.
+- Draf rekomendasi tindak lanjut berbasis AI pada halaman hasil inspeksi (opsional, membutuhkan `OPENAI_API_KEY` di Vercel).
 
 ## Backend Supabase
 
@@ -23,6 +24,8 @@ Versi terintegrasi memakai Supabase untuk login, database, foto privat, dan data
 3. Tambahkan URL aplikasi lokal dan domain Vercel ke **Authentication → URL Configuration** sebelum mendaftarkan akun pertama.
 
 Publishable key Supabase dipakai di aplikasi browser dan aman hanya karena seluruh tabel serta Storage dilindungi Row Level Security. Jangan pernah menambahkan `service_role` atau database password ke aplikasi maupun GitHub.
+
+Untuk mengaktifkan rekomendasi AI, ikuti [panduan setup AI](docs/SETUP_AI_RECOMMENDATION.md) dan simpan `OPENAI_API_KEY` hanya sebagai environment variable Vercel.
 
 ## Peran saat login
 

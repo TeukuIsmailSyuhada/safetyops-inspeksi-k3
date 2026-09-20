@@ -86,11 +86,58 @@ detail = function (app) {
 
 result = function (app) {
   originalResult(app);
+  renderAiCard(app);
   const closeButton = [...app.querySelectorAll('button')].find(button => button.textContent.includes('Tandai tindak lanjut selesai'));
   if (closeButton && !isSupervisor()) {
     closeButton.remove();
   }
 };
+
+function renderAiCard(app) {
+  if (!record?.aiState || record.assetId !== chosen?.[I.id]) return;
+  const sticky = app.querySelector('.sticky');
+  if (!sticky) return;
+  const card = document.createElement('section');
+  card.className = 'panel';
+  card.style.cssText = 'margin:16px 0;border-left:4px solid #7c3aed;background:#faf7ff';
+  if (record.aiState === 'loading') {
+    card.innerHTML = '<div class="body"><b>Rekomendasi AI sedang disusun...</b><p class="sub">AI merangkum checklist dan catatan temuan. Keputusan akhir tetap pada Supervisor.</p></div>';
+  } else if (record.aiState === 'done') {
+    const ai = record.aiRecommendation;
+    card.innerHTML = `<div class="body"><div class="dhead"><div><span class="navtitle" style="color:#7c3aed">REKOMENDASI AI</span><h3 style="margin:5px 0">${esc(ai.summary)}</h3></div><span class="pill attention">Prioritas ${esc(ai.priority)}</span></div><p><b>Tindakan:</b> ${esc(ai.action)}</p><p class="sub"><b>Dasar:</b> ${esc(ai.rationale)}</p><small class="sub">Draf AI · wajib diverifikasi Supervisor/teknisi sesuai SOP K3.</small></div>`;
+  } else {
+    card.innerHTML = '<div class="body"><b>Rekomendasi AI belum tersedia.</b><p class="sub">Rekomendasi rule-based dari checklist tetap menjadi acuan sementara. Cek konfigurasi AI lalu coba dari hasil inspeksi ini.</p></div>';
+  }
+  sticky.parentElement.insertBefore(card, sticky);
+}
+
+async function generateAiRecommendation(answerRows, condition) {
+  if (!record) return;
+  record.aiState = 'loading';
+  if (view === 'result') draw();
+  try {
+    const session = await sb.auth.getSession();
+    const token = session.data.session?.access_token;
+    if (!token) throw new Error('Sesi login tidak tersedia.');
+    const response = await fetch('/api/ai-recommendation', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        asset: { code: chosen[I.code], name: chosen[I.name], type: chosen[I.type], location: chosen[I.location] },
+        condition,
+        answers: answerRows.map(answer => ({ question: answer.question_label, value: answer.answer_value, flagged: answer.is_flagged, note: answer.note || '' }))
+      })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.recommendation) throw new Error(data.error || 'AI belum tersedia.');
+    record.aiRecommendation = data.recommendation;
+    record.aiState = 'done';
+  } catch (error) {
+    console.error('AI recommendation failed', error);
+    record.aiState = 'error';
+  }
+  if (view === 'result') draw();
+}
 
 function renderRoleControls() {
   const subtitle = document.querySelector('.subside');
@@ -401,6 +448,7 @@ submit = async function () {
     chosen = assets.find(asset => asset[I.id] === record.assetId) || chosen;
     view = 'result'; draw();
     showMessage('Inspeksi tersimpan dan dapat dilihat dari perangkat lain.');
+    generateAiRecommendation(answerRows, condition);
   } catch (error) {
     console.error(error);
     if (uploadedPath) await sb.storage.from('inspection-evidence').remove([uploadedPath]).catch(() => {});
