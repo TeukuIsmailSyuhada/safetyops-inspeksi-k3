@@ -29,7 +29,7 @@ Publishable key Supabase dipakai di aplikasi browser dan aman hanya karena selur
 - Pada layar **Masuk**, pengguna memilih mode `Inspector` atau `Supervisor`.
 - Pilihan tersebut harus sesuai dengan role akun pada Supabase; pilihan di browser tidak dapat menaikkan hak akses.
 - Akun baru selalu dibuat sebagai **Inspector**. Supervisor ditetapkan sekali lewat SQL pada profil akun yang sudah terdaftar.
-- Inspector melihat tombol kelola aset dan tutup tindak lanjut dalam keadaan abu-abu/nonaktif. Kebijakan RLS tetap menjadi perlindungan utama bila ada upaya memanggil API secara langsung.
+- Inspector tidak melihat kontrol kelola aset atau tutup tindak lanjut. Kebijakan RLS tetap menjadi perlindungan utama bila ada upaya memanggil API secara langsung.
 
 ## Teknologi
 

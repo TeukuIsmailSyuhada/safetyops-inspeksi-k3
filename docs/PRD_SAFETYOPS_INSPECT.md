@@ -58,7 +58,7 @@ Aturan keamanan: akun baru selalu berperan sebagai **Inspector**. Pilihan role d
 - Status kondisi alat ditentukan **rule-based dari checklist**, bukan AI atau analisis foto.
 - Aturan kondisi: seluruh jawaban lulus = `Baik`; observasi minor/jatuh tempo mendekat = `Perlu Perhatian`; komponen tidak terpasang = `Perlu Perbaikan`; kerusakan, tekanan tidak normal, akses tidak tersedia, atau masa berlaku lewat = `Tidak Layak Digunakan`.
 - QR mewakili aset dan membuka deep link aset di aplikasi.
-- Tombol manajemen pada Inspector tampil abu-abu/nonaktif sebagai penanda akses, tetapi keamanan sebenarnya tetap ditegakkan oleh Supabase RLS.
+- Kontrol manajemen tidak ditampilkan pada Inspector agar tampilan lapangan tetap fokus. Keamanan sebenarnya tetap ditegakkan oleh Supabase RLS.
 - Jangan menaruh `service_role`, database password, atau secret lain di browser/GitHub.
 
 ## 7. Non-goals MVP
@@ -73,6 +73,6 @@ Aturan keamanan: akun baru selalu berperan sebagai **Inspector**. Pilihan role d
 
 1. Login Supervisor → tambah aset atau tunjukkan tombol manajemen aktif.
 2. Download QR dan gunakan pada objek 3D/PPT.
-3. Login Inspector → tombol manajemen berwarna abu-abu/nonaktif.
+3. Login Inspector → kontrol manajemen tidak tampil, sementara tombol inspeksi tetap aktif.
 4. Inspector scan QR → foto kamera → checklist → submit.
 5. Supervisor kembali masuk → melihat riwayat/temuan dan menutup tindak lanjut.

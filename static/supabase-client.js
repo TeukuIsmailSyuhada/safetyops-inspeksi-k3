@@ -88,9 +88,7 @@ result = function (app) {
   originalResult(app);
   const closeButton = [...app.querySelectorAll('button')].find(button => button.textContent.includes('Tandai tindak lanjut selesai'));
   if (closeButton && !isSupervisor()) {
-    closeButton.disabled = true;
-    closeButton.textContent = 'Hanya Supervisor dapat menutup tindak lanjut';
-    closeButton.title = 'Akses ini tersedia untuk akun Supervisor.';
+    closeButton.remove();
   }
 };
 
@@ -103,7 +101,7 @@ function renderRoleControls() {
   if (view === 'assets') {
     const header = document.querySelector('#app .top');
     const primary = header?.querySelector(':scope > .btn');
-    if (header && primary && !document.querySelector('#add-asset-button')) {
+    if (header && primary && isSupervisor() && !document.querySelector('#add-asset-button')) {
       const controls = document.createElement('div');
       controls.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
       controls.innerHTML = isSupervisor()
@@ -113,7 +111,7 @@ function renderRoleControls() {
       controls.append(primary);
     }
   }
-  if (view === 'detail' && !document.querySelector('#archive-asset-button')) {
+  if (view === 'detail' && isSupervisor() && !document.querySelector('#archive-asset-button')) {
     const printButton = [...document.querySelectorAll('button')].find(button => button.textContent.trim() === 'Cetak label');
     if (printButton) {
       const archiveButton = document.createElement('button');
