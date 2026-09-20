@@ -7,6 +7,7 @@
 3. Salin seluruh isi file [001_initial_schema.sql](001_initial_schema.sql), lalu klik **Run** sekali.
    - Jika muncul error `operator does not exist: text = uuid`, jangan jalankan ulang file pertama. Jalankan file [002_finish_storage_and_seed.sql](002_finish_storage_and_seed.sql) sekali untuk menyelesaikan bagian Storage dan data demo.
 4. Setelah 001 berhasil, jalankan [003_inspection_automation.sql](003_inspection_automation.sql) sekali agar hasil inspeksi otomatis memperbarui kondisi alat.
+5. Jalankan [004_asset_lifecycle.sql](004_asset_lifecycle.sql) sekali agar fitur arsip aset aktif dan browser tidak dapat menghapus aset permanen.
 5. Buka **Authentication → Providers → Email** dan pastikan Email aktif.
 6. Buka **Authentication → URL Configuration**.
    - Tambahkan URL lokal: `http://127.0.0.1:4173`
