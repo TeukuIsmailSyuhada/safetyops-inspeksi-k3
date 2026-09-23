@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SafetyOps Inspect</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
 :root{
---navy:#08172c;--navy-2:#0f2747;--navy-3:#16355e;--brand:#0b2f6b;--brand-hi:#123e88;
+--navy:#102640;--navy-2:#193a60;--navy-3:#28517d;--brand:#2458a6;--brand-hi:#1d4b91;
 --accent:#ffc21a;--accent-hi:#ffd257;--accent-ink:#1a1204;
 --bg:#eef1f5;--p:#fff;--i:#0d1521;--m:#5d6b7f;--l:#dde2e9;--l2:#eef1f5;
 --g:#14833b;--gs:#14833b;--a:#b45309;--as:#b45309;--o:#c2410c;--os:#c2410c;--r:#b91c1c;--rs:#b91c1c;
@@ -18,18 +18,18 @@ body{margin:0;background:var(--bg);color:var(--i);font:15px/1.5 var(--sans);-web
 
 /* ---------- SHELL + SIDEBAR ---------- */
 .shell{min-height:100vh;padding-left:var(--sd)}
-.side{position:fixed;inset:0 auto 0 0;width:var(--sd);background:var(--navy);color:#b9c6d8;padding:20px 12px;display:flex;flex-direction:column;overflow-y:auto}
+.side{position:fixed;inset:0 auto 0 0;width:var(--sd);background:var(--navy);color:#d4dfed;padding:20px 12px;display:flex;flex-direction:column;overflow-y:auto;border-right:1px solid #23466d}
 .side:after{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--accent)}
 .brand{display:flex;gap:10px;align-items:center;color:#fff;font-weight:700;font-size:15.5px;letter-spacing:-.01em;padding:4px 6px}
 .logo{display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:var(--rad-s);background:var(--accent);color:var(--accent-ink)}
-.subside{font-size:11.5px;color:#7f8ca1;padding:8px 6px 0;line-height:1.65}
+.subside{font-size:11.5px;color:#a9bdd5;padding:8px 6px 0;line-height:1.65}
 .subside b{color:var(--accent);font-weight:600}
 .signout{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:#8e9bb0;padding:9px 0 0;font:inherit;font-size:11.5px;cursor:pointer}
 .signout:hover{color:#fff}
-.navtitle{font-size:10px;font-weight:700;letter-spacing:.11em;color:#65738a;margin:26px 8px 8px;text-transform:uppercase}
-.nav button{display:flex;align-items:center;gap:11px;width:100%;border:0;border-radius:var(--rad-s);background:transparent;color:#aebbcd;padding:11px 12px;text-align:left;font:inherit;font-weight:600;font-size:14px;margin:2px 0;cursor:pointer;min-height:44px;position:relative;transition:background .18s,color .18s}
+.navtitle{font-size:10px;font-weight:700;letter-spacing:.11em;color:#8fa8c5;margin:26px 8px 8px;text-transform:uppercase}
+.nav button{display:flex;align-items:center;gap:11px;width:100%;border:0;border-radius:var(--rad-s);background:transparent;color:#c3d1e2;padding:11px 12px;text-align:left;font:inherit;font-weight:600;font-size:14px;margin:2px 0;cursor:pointer;min-height:44px;position:relative;transition:background .18s,color .18s}
 .nav button:hover{background:var(--navy-2);color:#fff}
-.nav button.on{background:var(--brand);color:#fff}
+.nav button.on{background:#24548d;color:#fff;box-shadow:inset 0 0 0 1px #326ca8}
 .nav button.on:before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
 
 /* ---------- PAGE HEAD ---------- */
@@ -200,7 +200,7 @@ button,input,select,textarea{font:inherit}
 .histhead{display:none}.histrow{grid-template-columns:1fr auto;gap:6px}.histrow .hide{display:none}
 .row{flex-wrap:wrap;row-gap:9px}.row>.grow{flex:1 1 calc(100% - 50px)}.row>.pills{margin-left:50px;justify-content:flex-start;width:100%}
 .mobile{display:flex;position:fixed;z-index:4;bottom:0;left:0;right:0;background:var(--navy);border-top:3px solid var(--accent);justify-content:space-around;padding:6px 4px;box-shadow:0 -2px 12px #08172c40}
-.mobile button{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:#9aa8bd;font:inherit;font-size:10.5px;font-weight:600;min-width:64px;padding:6px 3px;min-height:50px;cursor:pointer}
+.mobile button{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:#b8c9dc;font:inherit;font-size:10.5px;font-weight:600;min-width:64px;padding:6px 3px;min-height:50px;cursor:pointer}
 .mobile button.on{color:var(--accent)}
 }
 @media print{.side,.mobile,.btn,.back,.toolbar{display:none!important}.shell{padding-left:0}.panel{box-shadow:none;break-inside:avoid}}

@@ -46,6 +46,9 @@ const originalDraw = draw;
 const originalList = list;
 const originalDetail = detail;
 const originalResult = result;
+const originalGo = go;
+let remoteLoadPromise = null;
+let realtimeChannel = null;
 
 function isSupervisor() {
   return currentProfile?.role === 'supervisor';
@@ -74,6 +77,14 @@ draw = function () {
   requestAnimationFrame(() => {
     if (view === 'detail') renderRealQr();
   });
+};
+
+// Segarkan halaman data saat navigasi agar perubahan Supabase langsung terlihat.
+go = function (nextView) {
+  originalGo(nextView);
+  if (signedInUser && ['dashboard', 'assets', 'history', 'recap'].includes(nextView)) {
+    void loadRemoteData();
+  }
 };
 
 list = function (app) {
@@ -217,6 +228,7 @@ async function archiveChosenAsset() {
 }
 
 async function signOutSafetyOps() {
+  if (realtimeChannel) { await sb.removeChannel(realtimeChannel); realtimeChannel = null; }
   await sb.auth.signOut();
   signedInUser = null;
   currentProfile = null;
@@ -494,6 +506,9 @@ function formatDate(value) {
 }
 
 async function loadRemoteData() {
+  if (!signedInUser) return false;
+  if (remoteLoadPromise) return remoteLoadPromise;
+  remoteLoadPromise = (async () => {
   try {
     const [profileResult, assetResult, followResult, inspectionResult] = await Promise.all([
       sb.from('profiles').select('full_name,role').eq('id', signedInUser.id).single(),
@@ -536,12 +551,24 @@ async function loadRemoteData() {
     if (fromQr) { chosen = fromQr; view = 'detail'; }
     else if (!assets.find(asset => asset[I.id] === chosen[I.id])) chosen = assets[0];
     draw();
+    subscribeRealtime();
     return true;
   } catch (error) {
     console.error(error);
     showMessage('Data Supabase belum dapat dimuat. Periksa login dan koneksi, lalu muat ulang halaman.', 'error');
     return false;
   }
+  })();
+  try { return await remoteLoadPromise; } finally { remoteLoadPromise = null; }
+}
+
+function subscribeRealtime() {
+  if (realtimeChannel || !signedInUser) return;
+  realtimeChannel = sb.channel(`safetyops-${signedInUser.id}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'assets' }, () => { void loadRemoteData(); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'inspections' }, () => { void loadRemoteData(); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'follow_ups' }, () => { void loadRemoteData(); })
+    .subscribe();
 }
 
 submit = async function () {
