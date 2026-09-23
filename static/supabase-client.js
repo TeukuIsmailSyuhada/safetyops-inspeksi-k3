@@ -64,7 +64,7 @@ checklist = function (app) {
   const total = items().length;
   const condition = done ? rule() : '';
   const type = esc(chosen[I.type]);
-  app.innerHTML = `<button class="back" onclick="go('photo')">← Kembali ke foto</button><div class="panel" style="max-width:820px;margin:auto"><div class="hd"><div class="dhead"><div><h2>Checklist ${type}</h2><p>Aset ${esc(chosen[I.code])} · Langkah 3 dari 4 · ${done}/${total} pemeriksaan selesai</p></div>${condition ? cond(condition) : '<span class="sub">Belum dinilai</span>'}</div><div class="progress"><i style="width:75%"></i></div></div><div class="body"><div class="hint"><b>Isi sesuai kondisi aktual.</b> Status akhir dihitung dari checklist, bukan dari foto.</div>${activeChecks().map(section => `<section class="section"><h3>${esc(section[0])}</h3><p>Lengkapi setiap pemeriksaan pada bagian ini.</p>${section[1].map(question).join('')}</section>`).join('')}<div class="sticky"><button class="btn outline" onclick="go('photo')">← Sebelumnya</button><button class="btn" ${done === total && noteOK() ? '' : 'disabled'} onclick="go('review')">Review hasil →</button></div></div></div>`;
+  app.innerHTML = `<button class="back" onclick="go('photo')">${icon('left',16)}Kembali ke foto</button><div class="panel" style="max-width:820px;margin:auto"><div class="hd"><div class="dhead"><div><h2>Checklist ${type}</h2><p>Aset ${esc(chosen[I.code])} · Langkah 3 dari 4 · ${done}/${total} pemeriksaan selesai</p></div>${condition ? cond(condition) : '<span class="sub">Belum dinilai</span>'}</div><div class="progress"><i style="width:75%"></i></div></div><div class="body"><div class="hint">${icon('info', 17)}<span><b>Isi sesuai kondisi aktual.</b> Status akhir dihitung dari checklist, bukan dari foto.</span></div>${activeChecks().map(section => `<section class="section"><h3>${esc(section[0])}</h3><p>Lengkapi setiap pemeriksaan pada bagian ini.</p>${section[1].map(question).join('')}</section>`).join('')}<div class="sticky"><button class="btn outline" onclick="go('photo')">← Sebelumnya</button><button class="btn" ${done === total && noteOK() ? '' : 'disabled'} onclick="go('review')">Review hasil →</button></div></div></div>`;
 };
 
 draw = function () {
@@ -98,15 +98,16 @@ function renderAiCard(app) {
   const sticky = app.querySelector('.sticky');
   if (!sticky) return;
   const card = document.createElement('section');
-  card.className = 'panel';
-  card.style.cssText = 'margin:16px 0;border-left:4px solid #7c3aed;background:#faf7ff';
+  card.className = 'panel ai';
+  card.style.cssText = 'margin:16px 0';
   if (record.aiState === 'loading') {
-    card.innerHTML = '<div class="body"><b>Rekomendasi AI sedang disusun...</b><p class="sub">AI merangkum checklist dan catatan temuan. Keputusan akhir tetap pada Supervisor.</p></div>';
+    card.innerHTML = `<div class="hd"><div><h2>${icon('sparkle', 18)}Rekomendasi AI sedang disusun…</h2><p>AI merangkum checklist dan catatan temuan.</p></div></div><div class="body"><div class="spin"></div></div>`;
   } else if (record.aiState === 'done') {
     const ai = record.aiRecommendation;
-    card.innerHTML = `<div class="body"><div class="dhead"><div><span class="navtitle" style="color:#7c3aed">REKOMENDASI AI</span><h3 style="margin:5px 0">${esc(ai.summary)}</h3></div><span class="pill attention">Prioritas ${esc(ai.priority)}</span></div><p><b>Tindakan:</b> ${esc(ai.action)}</p><p class="sub"><b>Dasar:</b> ${esc(ai.rationale)}</p><small class="sub">Draf AI · wajib diverifikasi Supervisor/teknisi sesuai SOP K3.</small></div>`;
+    const level = /kritis/i.test(ai.priority) ? 'unsafe' : /tinggi/i.test(ai.priority) ? 'repair' : /sedang/i.test(ai.priority) ? 'attention' : 'completed';
+    card.innerHTML = `<div class="hd"><div><h2>${icon('sparkle', 18)}${esc(ai.summary)}</h2><p>Draf tindak lanjut untuk ${esc(chosen[I.code])}</p></div><span class="pill ${level}">${icon('warn', 13)}Prioritas ${esc(ai.priority)}</span></div><div class="body"><p style="margin:0"><b>Tindakan:</b> ${esc(ai.action)}</p><p class="sub" style="margin:8px 0 0"><b>Dasar:</b> ${esc(ai.rationale)}</p></div><div class="aifoot">${icon('info', 16)}<span>Draf AI · wajib diverifikasi Supervisor atau teknisi sesuai SOP K3.</span></div>`;
   } else {
-    card.innerHTML = '<div class="body"><b>Rekomendasi AI belum tersedia.</b><p class="sub">Rekomendasi rule-based dari checklist tetap menjadi acuan sementara. Cek konfigurasi AI lalu coba dari hasil inspeksi ini.</p></div>';
+    card.innerHTML = `<div class="hd"><div><h2>${icon('sparkle', 18)}Rekomendasi AI belum tersedia</h2></div></div><div class="body"><p class="sub" style="margin:0">Rekomendasi rule-based dari checklist tetap menjadi acuan sementara. Periksa konfigurasi AI lalu coba lagi dari hasil inspeksi ini.</p></div>`;
   }
   sticky.parentElement.insertBefore(card, sticky);
 }
@@ -143,7 +144,7 @@ function renderRoleControls() {
   const subtitle = document.querySelector('.subside');
   if (subtitle && signedInUser) {
     const roleLabel = isSupervisor() ? 'Supervisor' : 'Inspector';
-    subtitle.innerHTML = `Sistem Inspeksi Alat K3<br><span style="color:#f2b705;font-weight:600">${esc(currentProfile?.full_name || signedInUser.email)} · ${roleLabel}</span><button onclick="signOutSafetyOps()" style="display:block;border:0;background:transparent;color:#8a94a6;padding:8px 0 0;font:inherit;cursor:pointer">Keluar</button>`;
+    subtitle.innerHTML = `Sistem Inspeksi Alat K3<br><b>${esc(currentProfile?.full_name || signedInUser.email)} · ${roleLabel}</b><button class="signout" onclick="signOutSafetyOps()">${icon('logout', 15)}Keluar</button>`;
   }
   if (view === 'assets') {
     const header = document.querySelector('#app .top');
@@ -152,7 +153,7 @@ function renderRoleControls() {
       const controls = document.createElement('div');
       controls.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap';
       controls.innerHTML = isSupervisor()
-        ? '<button class="btn outline" id="add-asset-button" onclick="openAssetManager()">+ Tambah aset</button>'
+        ? `<button class="btn outline" id="add-asset-button" onclick="openAssetManager()">${icon('plus', 18)}Tambah aset</button>`
         : '<button class="btn outline" id="add-asset-button" disabled title="Akses ini tersedia untuk akun Supervisor.">+ Tambah aset · Supervisor</button>';
       primary.replaceWith(controls);
       controls.append(primary);
@@ -182,9 +183,9 @@ function openAssetManager() {
 
 function assetManager(app) {
   if (!isSupervisor()) { view = 'assets'; return draw(); }
-  app.innerHTML = `<button class="back" onclick="go('assets')">← Kembali ke daftar alat</button>${head('Tambah aset K3', 'Supervisor mendaftarkan aset baru. Sistem akan membuat identitas QR unik secara otomatis.')}
-    <div class="panel" style="max-width:780px"><div class="body"><div class="hint"><b>Catatan audit.</b> Aset tidak dihapus permanen. Jika sudah tidak digunakan, arsipkan aset dari halaman detail.</div>
-    <form id="asset-form" onsubmit="saveAsset(event)"><div class="grid two"><label>Kode aset<input class="field" style="width:100%;margin-top:5px" name="asset_code" required maxlength="50" placeholder="Contoh: APAR-RKT-02"></label><label>Jenis alat<select class="field" style="width:100%;margin-top:5px" name="equipment_type" required><option value="APAR">APAR</option><option value="Helm Safety">Helm Safety</option><option value="Sepatu Safety">Sepatu Safety</option><option value="Arc Flash Suit">Arc Flash Suit</option></select></label><label>Nama aset<input class="field" style="width:100%;margin-top:5px" name="name" required maxlength="160" placeholder="Contoh: APAR Dry Chemical 3 kg"></label><label>Lokasi<input class="field" style="width:100%;margin-top:5px" name="location" required maxlength="160" placeholder="Contoh: Area Produksi A"></label></div><label style="display:block;margin-top:14px">Detail lokasi<input class="field" style="width:100%;margin-top:5px" name="location_detail" maxlength="250" placeholder="Contoh: Dekat Panel A-03"></label><div class="actions"><button type="button" class="btn outline" onclick="go('assets')">Batal</button><button class="btn" type="submit">Simpan & buat QR</button></div></form></div></div>`;
+  app.innerHTML = `<button class="back" onclick="go('assets')">${icon('left',16)}Kembali ke daftar alat</button>${head('Tambah aset K3', 'Supervisor mendaftarkan aset baru. Sistem akan membuat identitas QR unik secara otomatis.')}
+    <div class="panel" style="max-width:780px"><div class="body"><div class="hint">${icon('info', 17)}<span><b>Catatan audit.</b> Aset tidak dihapus permanen. Jika sudah tidak digunakan, arsipkan aset dari halaman detail.</span></div>
+    <form id="asset-form" onsubmit="saveAsset(event)"><div class="grid two"><label>Kode aset<input class="field" style="width:100%;margin-top:5px" name="asset_code" required maxlength="50" placeholder="Contoh: APAR-RKT-02"></label><label>Jenis alat<select class="field" style="width:100%;margin-top:5px" name="equipment_type" required><option value="APAR">APAR</option><option value="Helm Safety">Helm Safety</option><option value="Sepatu Safety">Sepatu Safety</option><option value="Arc Flash Suit">Arc Flash Suit</option></select></label><label>Nama aset<input class="field" style="width:100%;margin-top:5px" name="name" required maxlength="160" placeholder="Contoh: APAR Dry Chemical 3 kg"></label><label>Lokasi<input class="field" style="width:100%;margin-top:5px" name="location" required maxlength="160" placeholder="Contoh: Area Produksi A"></label></div><label style="display:block;margin-top:14px">Detail lokasi<input class="field" style="width:100%;margin-top:5px" name="location_detail" maxlength="250" placeholder="Contoh: Dekat Panel A-03"></label><div class="actions"><button type="button" class="btn outline" onclick="go('assets')">Batal</button><button class="btn" type="submit">${icon('qr', 18)}Simpan &amp; buat QR</button></div></form></div></div>`;
 }
 
 async function saveAsset(event) {
@@ -225,7 +226,8 @@ async function signOutSafetyOps() {
 
 function renderRealQr() {
   const holder = document.querySelector('.qr');
-  const token = qrTokens.get(chosen[I.id]);
+  // Aset contoh belum punya qr_token dari Supabase; pakai id-nya agar QR demo tetap nyata.
+  const token = qrTokens.get(chosen[I.id]) || chosen[I.id];
   if (!holder || !token || !window.QRCode) return;
   holder.innerHTML = '';
   holder.style.background = '#fff';
@@ -237,7 +239,7 @@ function renderRealQr() {
     downloadButton.id = 'download-qr';
     downloadButton.className = 'btn outline';
     downloadButton.style.cssText = 'display:block;width:100%;margin-top:8px';
-    downloadButton.textContent = 'Download QR PNG';
+    downloadButton.innerHTML = icon('download', 18) + 'Download QR PNG';
     downloadButton.onclick = downloadQr;
     printButton.parentElement.insertBefore(downloadButton, printButton);
   }
@@ -257,11 +259,68 @@ function downloadQr() {
 function injectLandingAuthStyle() {
   if (document.querySelector('#auth-landing-style')) return;
   document.head.insertAdjacentHTML('beforeend', `<style id="auth-landing-style">
-    .auth-cover{position:fixed;inset:0;z-index:20;overflow:auto;background:#e7e9ed;padding:28px;font-family:'IBM Plex Sans',"Segoe UI",Arial,sans-serif}
-    .auth-layout{width:min(1080px,100%);min-height:620px;margin:auto;display:grid;grid-template-columns:1.08fr .92fr;border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 24px 70px #10151f2e;border:1px solid #d9dce2}
-    .auth-hero{padding:56px 54px;background:#10151f;color:#fff;display:flex;flex-direction:column;justify-content:center;border-bottom:4px solid #f2b705}.auth-hero .brand{padding:0}.auth-kicker{color:#f2b705;font-size:12px;font-weight:800;letter-spacing:.1em;margin:34px 0 12px}.auth-hero h1{font-size:36px;line-height:1.14;letter-spacing:-.02em;margin:0 0 16px}.auth-hero p{margin:0;color:#c7cfdb;max-width:430px}.auth-points{display:grid;gap:14px;margin:34px 0 0;padding:0;list-style:none}.auth-points li{display:flex;gap:10px;align-items:flex-start;color:#dfe4ea}.auth-points b{display:grid;place-items:center;flex:0 0 22px;height:22px;border-radius:3px;background:#f2b705;color:#191307;font-size:13px;font-weight:900}
-    .auth-box{padding:52px 48px;display:flex;flex-direction:column;justify-content:center}.auth-box h2{font-size:26px;letter-spacing:-.015em;margin:0 0 6px;font-weight:700}.auth-box>p{color:#5b6472;margin:0 0 22px}.auth-switch{display:grid;grid-template-columns:1fr 1fr;background:#eef0f2;border-radius:3px;padding:4px;margin-bottom:20px}.auth-switch button{border:0;border-radius:2px;background:transparent;color:#5b6472;padding:9px;cursor:pointer;font-weight:700;min-height:38px}.auth-switch button.active{background:#fff;color:#151a21;box-shadow:0 1px 3px #10151f1a}.auth-role-label{font-size:12px;font-weight:750;margin:0 0 7px}.auth-role{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:17px}.auth-role button{min-height:57px;text-align:left;border:1px solid #c4ccd6;background:#fff;border-radius:3px;padding:9px 10px;cursor:pointer;color:#151a21;font-weight:750}.auth-role button span{display:block;font-size:11px;color:#5b6472;font-weight:400;margin-top:2px}.auth-role button.active{border-color:#f2b705;background:#fdf7e5;color:#151a21;box-shadow:inset 0 0 0 2px #f2b705}.auth-box label{display:block;font-size:12px;font-weight:700;margin:13px 0 5px}.auth-box input{width:100%;height:44px;border:1px solid #c4ccd6;border-radius:3px;padding:0 11px;background:#fff}.auth-box input:focus{outline:3px solid #1d4ed8;border-color:#1d4ed8}.auth-help{font-size:12px;color:#5b6472;margin-top:15px;line-height:1.5}.auth-error{min-height:18px;color:#b91c1c;font-size:12px;margin-top:12px}.auth-submit{width:100%;margin-top:8px}.auth-note{font-size:11px;color:#7b8494;margin:20px 0 0;text-align:center}
-    @media(max-width:760px){.auth-cover{padding:0}.auth-layout{min-height:100vh;border:0;border-radius:0;display:block}.auth-hero{padding:30px 24px}.auth-kicker,.auth-points{display:none}.auth-hero h1{font-size:28px;margin-top:20px}.auth-box{padding:31px 24px}.auth-box h2{font-size:24px}}
+    .auth-cover{position:fixed;inset:0;z-index:20;overflow:auto;background:#061a3f;font-family:'IBM Plex Sans',"Segoe UI",Arial,sans-serif;color:#0d1521}
+    .auth-layout{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr)}
+
+    /* ---- LEFT: industrial hero ---- */
+    .auth-hero{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:52px 56px;color:#fff;overflow:hidden;background:#0a2a63}
+    .auth-hero>*{position:relative;z-index:2}
+    .auth-hero:before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(158deg,#124a9e 0%,#0a2f70 44%,#061a3f 100%)}
+    .auth-hero:after{content:"";position:absolute;inset:0;z-index:1;opacity:.5;background-image:linear-gradient(#ffffff14 1px,transparent 1px),linear-gradient(90deg,#ffffff14 1px,transparent 1px),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 300' preserveAspectRatio='none'%3E%3Cg fill='%23041229'%3E%3Crect x='0' y='214' width='1200' height='86'/%3E%3Crect x='38' y='120' width='74' height='94'/%3E%3Crect x='58' y='58' width='22' height='62'/%3E%3Crect x='148' y='152' width='112' height='62'/%3E%3Crect x='298' y='88' width='38' height='126'/%3E%3Crect x='358' y='140' width='92' height='74'/%3E%3Crect x='498' y='48' width='28' height='166'/%3E%3Crect x='556' y='118' width='124' height='96'/%3E%3Crect x='718' y='160' width='82' height='54'/%3E%3Crect x='838' y='78' width='34' height='136'/%3E%3Crect x='898' y='130' width='104' height='84'/%3E%3Crect x='1048' y='168' width='114' height='46'/%3E%3C/g%3E%3C/svg%3E");background-size:52px 52px,52px 52px,100% 42%;background-position:0 0,0 0,bottom center;background-repeat:repeat,repeat,no-repeat}
+    .auth-hero .brand{display:flex;gap:11px;align-items:center;color:#fff;font-weight:700;font-size:16px;padding:0}
+    .auth-hero .logo{display:grid;place-items:center;width:36px;height:36px;flex:none;border-radius:7px;background:#ffc21a;color:#1a1204}
+    .auth-hero-in{margin:auto 0}
+    .auth-kicker{display:flex;align-items:center;gap:12px;color:#ffc21a;font-size:11.5px;font-weight:800;letter-spacing:.14em;margin:0 0 18px}
+    .auth-kicker i{display:block;width:46px;height:3px;background:#ffc21a;border-radius:2px}
+    .auth-hero h1{font-size:clamp(34px,3.6vw,52px);line-height:1.06;letter-spacing:-.03em;margin:0 0 20px;font-weight:700;text-transform:uppercase}
+    .auth-hero h1 em{display:block;font-style:italic;color:#ffc21a}
+    .auth-hero>.auth-hero-in>p{margin:0;color:#c3d3ec;max-width:440px;font-size:15px;line-height:1.6}
+    .auth-hero p b{display:block;margin-top:6px;color:#fff;font-weight:600;letter-spacing:.01em}
+    .auth-chips{display:flex;gap:12px;flex-wrap:wrap;margin:38px 0 0}
+    .auth-chips .chip{border:1px solid #ffffff2e;background:#ffffff14;backdrop-filter:blur(3px);border-radius:8px;padding:12px 16px;min-width:132px}
+    .auth-chips b{display:block;font-size:13.5px;font-weight:700;color:#fff}
+    .auth-chips span{display:block;font-size:11.5px;color:#a9c0e0;margin-top:2px}
+    .auth-copy{font-size:10.5px;letter-spacing:.09em;color:#7f9ac4;font-weight:600}
+
+    /* ---- RIGHT: form panel ---- */
+    .auth-box{display:flex;flex-direction:column;justify-content:space-between;background:#fff;padding:44px 52px 28px}
+    .auth-box-in{margin:auto 0;width:100%;max-width:390px;margin-left:auto;margin-right:auto}
+    .auth-mark{display:flex;gap:10px;align-items:center;font-weight:700;font-size:19px;letter-spacing:-.02em;color:#0b2f6b;margin-bottom:30px}
+    .auth-mark .logo{display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:7px;background:#ffc21a;color:#1a1204}
+    .auth-box h2{font-size:27px;letter-spacing:-.025em;margin:0 0 6px;font-weight:700}
+    .auth-box>.auth-box-in>p{color:#5d6b7f;margin:0 0 22px;font-size:13.5px;line-height:1.55}
+    .auth-switch{display:grid;grid-template-columns:1fr 1fr;background:#eef1f5;border-radius:8px;padding:4px;margin-bottom:20px}
+    .auth-switch button{border:0;border-radius:6px;background:transparent;color:#5d6b7f;padding:10px;cursor:pointer;font:inherit;font-weight:700;font-size:13.5px;min-height:40px;transition:background .18s,color .18s}
+    .auth-switch button.active{background:#fff;color:#0b2f6b;box-shadow:0 1px 3px #0d152122}
+    .auth-role-label{font-size:12px;font-weight:700;margin:0 0 8px}
+    .auth-role{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+    .auth-role button{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-height:62px;text-align:left;border:1.5px solid #d3dae5;background:#fff;border-radius:8px;padding:10px 12px;cursor:pointer;color:#0d1521;font:inherit;font-weight:700;font-size:13px;transition:border-color .18s,background .18s}
+    .auth-role button:hover{border-color:#9fb0c9}
+    .auth-role button span{font-size:11px;color:#5d6b7f;font-weight:400;line-height:1.35}
+    .auth-role button.active{border-color:#0b2f6b;background:#f2f6fd;box-shadow:inset 0 0 0 1px #0b2f6b}
+    .auth-box label{display:block;font-size:12.5px;font-weight:700;margin:15px 0 6px}
+    .auth-box label i{color:#dc2626;font-style:normal}
+    .auth-input{position:relative}
+    .auth-box input{width:100%;height:48px;border:1.5px solid #d3dae5;border-radius:8px;padding:0 13px;background:#fff;font:inherit;font-size:14px;color:#0d1521}
+    .auth-box input::placeholder{color:#9aa7b8}
+    .auth-box input:hover{border-color:#9fb0c9}
+    .auth-box input:focus{outline:3px solid #1d4ed833;border-color:#0b2f6b}
+    .auth-input input{padding-right:46px}
+    .auth-eye{position:absolute;right:4px;top:4px;width:40px;height:40px;display:grid;place-items:center;border:0;background:transparent;color:#5d6b7f;cursor:pointer;border-radius:6px}
+    .auth-eye:hover{color:#0b2f6b;background:#eef1f5}
+    .auth-forgot{display:block;text-align:right;margin-top:8px;font-size:12px;color:#0b2f6b;font-weight:600;background:0;border:0;padding:0;cursor:pointer}
+    .auth-forgot:hover{text-decoration:underline}
+    .auth-error{min-height:18px;color:#b91c1c;font-size:12.5px;font-weight:600;margin-top:12px}
+    .auth-submit{width:100%;margin-top:6px;min-height:50px;background:#0b2f6b;border:2px solid #0b2f6b;color:#fff;border-radius:8px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .18s,border-color .18s}
+    .auth-submit:hover{background:#123e88;border-color:#123e88}
+    .auth-submit:focus-visible,.auth-switch button:focus-visible,.auth-role button:focus-visible,.auth-eye:focus-visible,.auth-forgot:focus-visible{outline:3px solid #1d4ed8;outline-offset:2px}
+    .auth-sep{display:flex;align-items:center;gap:12px;margin:22px 0 14px;color:#8a97a8;font-size:11.5px;font-weight:700}
+    .auth-sep:before,.auth-sep:after{content:"";flex:1;height:1px;background:#e2e7ee}
+    .auth-help{display:flex;gap:9px;align-items:flex-start;font-size:12px;color:#5d6b7f;line-height:1.55;background:#f6f8fb;border:1px solid #e2e7ee;border-radius:8px;padding:11px 13px}
+    .auth-foot{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#8a97a8;padding-top:20px;border-top:1px solid #eef1f5;margin-top:24px}
+
+    @media(max-width:900px){.auth-layout{grid-template-columns:1fr}.auth-hero{padding:34px 26px 30px;min-height:auto}.auth-hero h1{font-size:30px}.auth-chips,.auth-copy{display:none}.auth-hero-in{margin:22px 0 0}.auth-box{padding:30px 24px 22px}.auth-box-in{max-width:none}.auth-kicker{font-size:10.5px;letter-spacing:.1em;gap:9px;margin-bottom:14px}.auth-kicker i{width:26px;height:2px}}
+    @media(prefers-reduced-motion:reduce){.auth-cover *{transition-duration:.01ms!important}}
   </style>`);
 }
 
@@ -269,16 +328,83 @@ showAuth = function (message = '', mode = 'login') {
   authMode = mode;
   injectLandingAuthStyle();
   document.querySelector('#auth-cover')?.remove();
-  document.body.insertAdjacentHTML('beforeend', `<section class="auth-cover" id="auth-cover" aria-label="Masuk SafetyOps Inspect"><div class="auth-layout"><aside class="auth-hero"><div class="brand"><span class="logo">✓</span>SafetyOps Inspect</div><span class="auth-kicker">SISTEM INSPEKSI ALAT K3</span><h1>Inspeksi lebih tertib, bukti lebih siap.</h1><p>Catat kondisi APAR, helm safety, dan sepatu safety secara konsisten dari perangkat apa pun.</p><ul class="auth-points"><li><b>1</b><span><strong>Scan QR aset</strong><br>Temukan identitas alat yang tepat.</span></li><li><b>2</b><span><strong>Foto & checklist</strong><br>Dokumentasi kondisi aktual di lapangan.</span></li><li><b>3</b><span><strong>Riwayat terlacak</strong><br>Data tersimpan aman untuk tindak lanjut.</span></li></ul></aside><main class="auth-box"><div class="brand" style="color:#151a21;padding:0"><span class="logo">✓</span>SafetyOps</div><h2 id="auth-title" style="margin-top:26px">Masuk ke sistem</h2><p id="auth-description">Gunakan akun petugas yang sudah terdaftar.</p><div class="auth-switch"><button type="button" id="auth-login-tab" class="active" onclick="setAuthMode('login')">Masuk</button><button type="button" id="auth-signup-tab" onclick="setAuthMode('signup')">Daftar akun</button></div><form onsubmit="submitCurrentAuth(event)"><div id="auth-name-group" style="display:none"><label for="auth-name">Nama lengkap</label><input id="auth-name" autocomplete="name" placeholder="Nama petugas"></div><label for="auth-email">Email</label><input id="auth-email" type="email" autocomplete="email" required placeholder="nama@gmail.com"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" required minlength="8" placeholder="Minimal 8 karakter"><div class="auth-error" id="auth-error">${esc(message)}</div><button class="btn auth-submit" id="auth-submit" type="submit">Masuk</button></form><div class="auth-help">Gunakan email dan password. Saat daftar pertama kali, verifikasi email dari Supabase sebelum masuk.</div><p class="auth-note">Tidak memakai Google Login agar MVP tetap sederhana dan stabil.</p></main></div></section>`);
-  document.querySelector('.auth-switch').insertAdjacentHTML('afterend', '<div id="auth-role-wrap"><p class="auth-role-label">Masuk sebagai</p><div class="auth-role"><button type="button" id="role-inspector" onclick="setRequestedRole(\'inspector\')">Inspector<span>Foto, checklist, dan inspeksi</span></button><button type="button" id="role-supervisor" onclick="setRequestedRole(\'supervisor\')">Supervisor<span>Kelola aset dan tindak lanjut</span></button></div></div>');
+  document.body.insertAdjacentHTML('beforeend', `<section class="auth-cover" id="auth-cover" aria-label="Masuk SafetyOps Inspect"><div class="auth-layout">
+    <aside class="auth-hero">
+      <div class="brand"><span class="logo">${icon('shield', 21)}</span>SafetyOps Inspect</div>
+      <div class="auth-hero-in">
+        <p class="auth-kicker"><i></i>KESELAMATAN &amp; KEPATUHAN K3</p>
+        <h1>Satu Platform<em>Untuk Semua</em>Inspeksi Alat K3.</h1>
+        <p>Sistem inspeksi berbasis QR Code untuk APAR, Hydrant, P3K, Eyewash, dan APD di seluruh area kerja.<b>Scan. Periksa. Terdokumentasi.</b></p>
+        <div class="auth-chips">
+          <div class="chip"><b>Scan QR</b><span>Identitas alat</span></div>
+          <div class="chip"><b>Foto &amp; Checklist</b><span>Bukti lapangan</span></div>
+          <div class="chip"><b>Riwayat</b><span>Tersimpan aman</span></div>
+        </div>
+      </div>
+      <div class="auth-copy">© 2026 SAFETYOPS INSPECT · SISTEM INSPEKSI ALAT K3</div>
+    </aside>
+    <main class="auth-box">
+      <div class="auth-box-in">
+        <div class="auth-mark"><span class="logo">${icon('shield', 20)}</span>SafetyOps</div>
+        <h2 id="auth-title">Selamat Datang!</h2>
+        <p id="auth-description">Masukkan email dan password petugas untuk mengakses Dashboard SafetyOps.</p>
+        <div class="auth-switch"><button type="button" id="auth-login-tab" class="active" onclick="setAuthMode('login')">Masuk</button><button type="button" id="auth-signup-tab" onclick="setAuthMode('signup')">Daftar Akun</button></div>
+        <div id="auth-role-wrap"><p class="auth-role-label">Masuk sebagai</p><div class="auth-role"><button type="button" id="role-inspector" onclick="setRequestedRole('inspector')">Inspector<span>Foto, checklist, dan inspeksi</span></button><button type="button" id="role-supervisor" onclick="setRequestedRole('supervisor')">Supervisor<span>Kelola aset dan tindak lanjut</span></button></div></div>
+        <form onsubmit="submitCurrentAuth(event)">
+          <div id="auth-name-group" style="display:none"><label for="auth-name">Nama lengkap <i>*</i></label><input id="auth-name" autocomplete="name" placeholder="Nama petugas K3"></div>
+          <label for="auth-email">Email <i>*</i></label>
+          <input id="auth-email" type="email" autocomplete="email" required placeholder="nama@perusahaan.com">
+          <label for="auth-password">Password <i>*</i></label>
+          <div class="auth-input"><input id="auth-password" type="password" autocomplete="current-password" required minlength="8" placeholder="Masukkan password"><button type="button" class="auth-eye" id="auth-eye" onclick="togglePassword()" aria-label="Tampilkan password" title="Tampilkan password">${icon('eye', 19)}</button></div>
+          <button type="button" class="auth-forgot" id="auth-forgot" onclick="forgotPassword()">Lupa password?</button>
+          <div class="auth-error" id="auth-error" role="alert">${esc(message)}</div>
+          <button class="auth-submit" id="auth-submit" type="submit">Masuk</button>
+        </form>
+        <div class="auth-sep">PETUGAS BARU?</div>
+        <div class="auth-help">${icon('info', 16)}<span>Daftar akun terlebih dahulu, lalu verifikasi email dari Supabase sebelum masuk. Akun baru otomatis berperan <b>Inspector</b>.</span></div>
+      </div>
+      <div class="auth-foot"><span>© 2026 SafetyOps Inspect</span><span>Data dilindungi Row Level Security</span></div>
+    </main>
+  </div></section>`);
   setAuthMode(mode);
 };
+
+function togglePassword() {
+  const input = document.querySelector('#auth-password');
+  const button = document.querySelector('#auth-eye');
+  if (!input || !button) return;
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  button.innerHTML = icon(show ? 'eye-off' : 'eye', 19);
+  button.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+  button.title = show ? 'Sembunyikan password' : 'Tampilkan password';
+}
+
+async function forgotPassword() {
+  const email = document.querySelector('#auth-email')?.value.trim();
+  const errorBox = document.querySelector('#auth-error');
+  if (!email) {
+    errorBox.style.color = '';
+    errorBox.textContent = 'Isi email terlebih dahulu, lalu tekan Lupa password.';
+    return;
+  }
+  errorBox.style.color = '';
+  errorBox.textContent = 'Mengirim tautan…';
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
+  if (error) {
+    errorBox.textContent = 'Tautan atur ulang password belum dapat dikirim. Periksa email lalu coba lagi.';
+    return;
+  }
+  errorBox.style.color = '#14833b';
+  errorBox.textContent = `Tautan atur ulang password dikirim ke ${email}. Periksa inbox atau folder spam.`;
+}
 
 function setAuthMode(mode) {
   authMode = mode;
   const isSignup = mode === 'signup';
-  document.querySelector('#auth-title').textContent = isSignup ? 'Buat akun petugas' : 'Masuk ke sistem';
-  document.querySelector('#auth-description').textContent = isSignup ? 'Akun baru akan terdaftar sebagai Inspector.' : 'Gunakan akun petugas yang sudah terdaftar.';
+  document.querySelector('#auth-title').textContent = isSignup ? 'Buat Akun Petugas' : 'Selamat Datang!';
+  document.querySelector('#auth-description').textContent = isSignup ? 'Akun baru terdaftar sebagai Inspector dan perlu verifikasi email sebelum dapat masuk.' : 'Masukkan email dan password petugas untuk mengakses Dashboard SafetyOps.';
+  document.querySelector('#auth-forgot').style.display = isSignup ? 'none' : 'block';
   document.querySelector('#auth-name-group').style.display = isSignup ? 'block' : 'none';
   document.querySelector('#auth-name').required = isSignup;
   document.querySelector('#auth-password').autocomplete = isSignup ? 'new-password' : 'current-password';
@@ -288,7 +414,9 @@ function setAuthMode(mode) {
   document.querySelector('#auth-role-wrap').style.display = isSignup ? 'none' : 'block';
   if (isSignup) requestedRole = 'inspector';
   setRequestedRole(requestedRole);
-  document.querySelector('#auth-error').textContent = '';
+  const errorBox = document.querySelector('#auth-error');
+  errorBox.style.color = '';
+  errorBox.textContent = '';
 }
 
 function setRequestedRole(role) {
@@ -385,7 +513,10 @@ async function loadRemoteData() {
       qrTokens.set(row.id, row.qr_token);
       return [row.id, row.asset_code, row.name, row.equipment_type, row.location, row.location_detail || '—', row.current_condition, row.inspection_status, formatDate(row.last_inspected_at), row.next_inspection_at || '—', 'Petugas K3', follow?.recommendation || 'Tidak ada', follow?.status || 'Tidak ada'];
     });
-    assets.splice(0, assets.length, ...remoteAssets);
+    // Data contoh (40 aset) tetap dipertahankan bila Supabase belum berisi aset,
+    // supaya dashboard, rekap, dan demo tidak tampil kosong.
+    if (remoteAssets.length) assets.splice(0, assets.length, ...remoteAssets);
+    else showMessage('Supabase belum berisi aset. Menampilkan 40 aset contoh untuk demo.');
     const remoteHistory = await Promise.all((inspectionResult.data || []).map(async row => {
       const photoRow = Array.isArray(row.inspection_photos) ? row.inspection_photos[0] : row.inspection_photos;
       let signedPhoto = '';
