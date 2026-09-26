@@ -524,10 +524,11 @@ async function loadRemoteData() {
       qrTokens.set(row.id, row.qr_token);
       return [row.id, row.asset_code, row.name, row.equipment_type, row.location, row.location_detail || '—', row.current_condition, row.inspection_status, formatDate(row.last_inspected_at), row.next_inspection_at || '—', 'Petugas K3', follow?.recommendation || 'Tidak ada', follow?.status || 'Tidak ada'];
     });
-    // Data contoh (40 aset) tetap dipertahankan bila Supabase belum berisi aset,
-    // supaya dashboard, rekap, dan demo tidak tampil kosong.
-    if (remoteAssets.length) assets.splice(0, assets.length, ...remoteAssets);
-    else showMessage('Supabase belum berisi aset. Menampilkan 40 aset contoh untuk demo.');
+    // Setelah pengguna terautentikasi, Supabase adalah sumber data tunggal.
+    // Jangan mempertahankan/mengembalikan aset demo ketika query menghasilkan
+    // nol baris; hal itu membuat aset baru terlihat sesaat lalu menghilang.
+    assets.splice(0, assets.length, ...remoteAssets);
+    if (!remoteAssets.length) showMessage('Belum ada aset aktif di Supabase untuk akun ini.');
     const remoteHistory = await Promise.all((inspectionResult.data || []).map(async row => {
       const photoRow = Array.isArray(row.inspection_photos) ? row.inspection_photos[0] : row.inspection_photos;
       let signedPhoto = '';
@@ -545,12 +546,14 @@ async function loadRemoteData() {
     const token = new URLSearchParams(window.location.search).get('asset');
     const fromQr = token && assets.find(asset => qrTokens.get(asset[I.id]) === token);
     if (fromQr) { chosen = fromQr; view = 'detail'; }
-    else if (!assets.find(asset => asset[I.id] === chosen[I.id])) chosen = assets[0];
-    draw();
+    else if (!assets.find(asset => asset[I.id] === chosen?.[I.id])) chosen = assets[0] || null;
+    finishBoot();
     subscribeRealtime();
     return true;
   } catch (error) {
     console.error(error);
+    // Jangan jatuh ke data contoh: tampilkan status gagal agar tidak dikira data asli.
+    if (booting) { bootError = true; draw(); }
     showMessage('Data Supabase belum dapat dimuat. Periksa login dan koneksi, lalu muat ulang halaman.', 'error');
     return false;
   }
